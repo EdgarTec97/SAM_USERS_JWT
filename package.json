@@ -7,7 +7,7 @@
   "scripts": {
     "start": "yarn build && sam local start-api",
     "build": "sam build --beta-features",
-    "deploy": "sam deploy",
+    "deploy": "sam deploy --parameter-overrides",
     "format": "prettier 'src/**/*.ts' --write",
     "compile": "tsc",
     "compile:watch": "tsc -w --preserveWatchOutput true",
@@ -17,8 +17,6 @@
     "run-checks": "yarn lint && yarn test && yarn compile"
   },
   "dependencies": {
-    "esbuild": "^0.14.14",
-    "husky": "7.0.4",
     "@middy/core": "2.5.3",
     "@middy/http-cors": "2.5.3",
     "@middy/http-json-body-parser": "2.5.3",
@@ -26,29 +24,32 @@
     "class-transformer": "0.4.0",
     "class-transformer-validator": "0.9.1",
     "class-validator": "0.13.1",
+    "esbuild": "^0.14.14",
+    "husky": "7.0.4",
     "reflect-metadata": "0.1.13",
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "aws-sdk": "2.1024.0",
     "@types/aws-lambda": "^8.10.92",
     "@types/jest": "^29.2.0",
     "@types/node": "^18.11.4",
+    "@types/uuid": "8.3.1",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
+    "aws-sdk": "2.1024.0",
+    "dotenv": "^16.1.4",
     "eslint": "^8.8.0",
+    "eslint-config-airbnb-typescript": "14.0.2",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "2.25.2",
+    "eslint-plugin-jest": "^25.2.4",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^29.2.1",
-    "eslint-plugin-jest": "^25.2.4",
     "prettier": "^2.5.1",
+    "rimraf": "3.0.2",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
-    "typescript": "^4.8.4",
-    "@types/uuid": "8.3.1",
-    "eslint-config-airbnb-typescript": "14.0.2",
-    "eslint-plugin-import": "2.25.2",
-    "rimraf": "3.0.2"
+    "typescript": "^4.8.4"
   },
   "jest": {
     "moduleFileExtensions": [
