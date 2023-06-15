@@ -4,11 +4,10 @@ import { IDPathParameterMissing } from '@/domain/errors/IDPathParameterMissing';
 import {
   formatErrorResponse,
   formatJSONResponse
-} from '@/libs/formatJSONResponse';
+} from '@/domain/response/formatJSONResponse';
 import middify from '@/infrastructure/middlewares/middify';
 import HttpStatus from '@/domain/types/HttpStatus';
 import { GlobalFunctions } from '@/infrastructure/utils';
-import { UserResponseDTO } from '@/functions/dtos/user-response.dto';
 
 const getUseById = async (
   event: APIGatewayEvent
@@ -18,12 +17,10 @@ const getUseById = async (
 
   return formatJSONResponse(
     HttpStatus.CREATED,
-    UserResponseDTO.fromDomain(
-      User.fromPrimitives({
-        id: GlobalFunctions.randomUUID(),
-        firstName: 'Test'
-      } as UserPrimitives)
-    )
+    User.fromPrimitives({
+      id: GlobalFunctions.randomUUID(),
+      firstName: 'Test'
+    } as UserPrimitives).toPrimitives()
   );
 };
 

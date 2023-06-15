@@ -12,6 +12,8 @@ import HttpStatus from '@/domain/types/HttpStatus';
 import { DomainError } from '@/domain/errors/DomainError';
 import { UserRepository } from '@/infrastructure/database';
 
+declare const process: any;
+
 const createUser = async (
   event: RequestDTO<CreateUserDTO>
 ): Promise<APIGatewayProxyResult> => {

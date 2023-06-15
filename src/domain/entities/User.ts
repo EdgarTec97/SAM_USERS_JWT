@@ -45,25 +45,33 @@ export class User {
 
   private validate() {
     const roles = ['root', 'visitor', 'standard'];
-    if (roles.includes(this.role))
+    if (!roles.includes(this.role))
       throw new InvalidPropertyError(
-        `Invalid user role, should send one of this: ${JSON.stringify(roles)}.`
+        this.role,
+        `Invalid user role, should send one of this: ${roles}.`
       );
 
     if (
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+      !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
         this.email
       )
     )
-      throw new InvalidPropertyError("The email isn't in the correct format.");
+      throw new InvalidPropertyError(
+        this.email,
+        "The email isn't in the correct format."
+      );
 
     if (this.age < 18)
       throw new InvalidPropertyError(
+        this.age,
         `You must be of legal age to use this system.`
       );
 
-    if (GlobalFunctions.uuidValidator(this.id))
-      throw new InvalidPropertyError(`The id must be in UUID format.`);
+    if (!GlobalFunctions.uuidValidator(this.id))
+      throw new InvalidPropertyError(
+        this.id,
+        `The id (${this.id}) must be in UUID format.`
+      );
   }
 
   toPrimitives() {

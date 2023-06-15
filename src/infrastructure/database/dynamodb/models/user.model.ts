@@ -6,8 +6,8 @@ import { UserRole } from '@/domain/types/user.role';
 
 export class UserDocument extends Item {
   id!: number;
-  firstname!: string;
-  lastname!: string;
+  firstName!: string;
+  lastName!: string;
   username!: string;
   email!: string;
   password!: string;

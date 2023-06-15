@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export class BcryptLib {
   private static instance: BcryptLib | undefined;

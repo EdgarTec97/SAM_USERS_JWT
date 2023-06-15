@@ -7,11 +7,11 @@ export const UserSchema = new Schema(
       required: true,
       hashKey: true
     },
-    firstname: {
+    firstName: {
       type: String,
       required: true
     },
-    lastname: {
+    lastName: {
       type: String,
       required: true
     },
