@@ -1,4 +1,6 @@
 import { UserRole } from '@/domain/types/user.role';
+import { InvalidPropertyError } from '@/domain/errors/InvalidPropertyError';
+import { GlobalFunctions } from '@/infrastructure/utils';
 
 export type UserPrimitives = ReturnType<User['toPrimitives']>;
 
@@ -42,9 +44,26 @@ export class User {
   }
 
   private validate() {
-    if (['root', 'visitor', 'standard'].includes(this.role)) {
-      throw new Error('Invalid user role');
-    }
+    const roles = ['root', 'visitor', 'standard'];
+    if (roles.includes(this.role))
+      throw new InvalidPropertyError(
+        `Invalid user role, should send one of this: ${JSON.stringify(roles)}.`
+      );
+
+    if (
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+        this.email
+      )
+    )
+      throw new InvalidPropertyError("The email isn't in the correct format.");
+
+    if (this.age < 18)
+      throw new InvalidPropertyError(
+        `You must be of legal age to use this system.`
+      );
+
+    if (GlobalFunctions.uuidValidator(this.id))
+      throw new InvalidPropertyError(`The id must be in UUID format.`);
   }
 
   toPrimitives() {

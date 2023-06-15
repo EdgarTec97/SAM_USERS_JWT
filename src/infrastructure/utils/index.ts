@@ -1,4 +1,4 @@
-import { v4, V4Options, v1, V1Options } from 'uuid';
+import { v4, V4Options, v1, V1Options, validate } from 'uuid';
 
 const UUID = {
   v1: (options?: V4Options) => v4(options),
@@ -13,5 +13,9 @@ export class GlobalFunctions {
   ) {
     const uuid = UUID[type];
     return uuid ? uuid(options) : UUID.default(options);
+  }
+
+  static uuidValidator(uuid: string) {
+    return validate(uuid);
   }
 }

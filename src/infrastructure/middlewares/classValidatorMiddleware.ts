@@ -1,5 +1,6 @@
 import middy, { MiddlewareObj } from '@middy/core';
 import { ClassType, transformAndValidate } from 'class-transformer-validator';
+import { DTOPropertiesError } from '@/domain/errors/DTOPropertiesError';
 
 export class ClassValidatorMiddleware<T extends Record<string, unknown>>
   implements MiddlewareObj
@@ -25,8 +26,7 @@ export class ClassValidatorMiddleware<T extends Record<string, unknown>>
         request.event.body
       ).catch((err) => {
         console.error(err);
-        request.event.body = undefined;
-        return;
+        return new DTOPropertiesError(err.toString());
       });
       request.event.body = transformedBody;
     }
