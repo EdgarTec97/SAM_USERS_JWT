@@ -16,6 +16,7 @@ const createUser = async (
   event: RequestDTO<CreateUserDTO>
 ): Promise<APIGatewayProxyResult> => {
   if (event.body instanceof DomainError) return formatErrorResponse(event.body);
+
   try {
     const { body } = event as { body: CreateUserDTO };
 
