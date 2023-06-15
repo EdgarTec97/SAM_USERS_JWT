@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult, Handler } from 'aws-lambda';
-import { User, UserPrimitives } from '@/domain/entities/User';
+import { User } from '@/domain/entities/User';
 import {
   formatErrorResponse,
   formatJSONResponse
