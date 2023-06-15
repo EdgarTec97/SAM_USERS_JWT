@@ -16,6 +16,7 @@ export const formatErrorResponse = async (error: DomainError) => {
   return {
     statusCode: DomainErrorToHttpStatus[error.domainErrorCode],
     body: JSON.stringify({
+      success: false,
       message: error.message,
       domainError: error.domainErrorCode
     })

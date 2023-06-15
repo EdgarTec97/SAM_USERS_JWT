@@ -2,11 +2,13 @@ import { aws } from 'dynamoose';
 import AWS from 'aws-sdk';
 import { User, UserPrimitives } from '@/domain/entities/User';
 import { UserRepository } from '@/domain/repositories/user.repository';
+import { UserNotFound } from '@/domain/errors/UserNotFound';
 import {
   UserModel,
   UserDocument
-} from '@/infrastructure/database/dynamo/models/user.model';
+} from '@/infrastructure/database/dynamodb/models/user.model';
 import { config } from '@/infrastructure/config';
+import { BcryptLib } from '@/infrastructure/utils/encrypt.lib';
 
 export class DynamoUserRepository implements UserRepository {
   private readonly model = UserModel;
@@ -29,34 +31,23 @@ export class DynamoUserRepository implements UserRepository {
     );
   }
 
-  async saveUser(cedis: User): Promise<void> {
-    const document = new this.model(cedis.toPrimitives());
-    await document.save().catch((err) => {
-      console.error(err);
-    });
+  async createOrUpdate(user: User): Promise<void> {
+    const userPrimitives = user.toPrimitives();
+
+    userPrimitives.password = await BcryptLib.getInstance().encryptValue(
+      userPrimitives.password,
+      2
+    );
+    const document = new this.model(userPrimitives);
+    await document.save();
   }
 
   async getUserById(userId: string): Promise<User | undefined> {
-    let document: UserDocument | undefined;
-    try {
-      document = await this.model.get(userId);
-    } catch (error) {
-      console.error(error);
-      document = undefined;
-    }
+    const document: UserDocument | undefined = await this.model.get(userId);
 
-    return document
-      ? User.fromPrimitives((<unknown>document) as UserPrimitives)
-      : undefined;
-  }
+    if (!document) throw new UserNotFound(userId);
 
-  async updateUser(user: User): Promise<void> {
-    const userPrimitives = user.toPrimitives();
-    const document = new this.model(userPrimitives);
-
-    await document.save().catch((err) => {
-      console.error(err);
-    });
+    return User.fromPrimitives((<unknown>document) as UserPrimitives);
   }
 
   async deleteUser(userId: string): Promise<void> {

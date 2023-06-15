@@ -1,7 +1,7 @@
 import { model } from 'dynamoose';
 import { Item } from 'dynamoose/dist/Item';
 import { config } from '@/infrastructure/config';
-import { UserSchema } from '@/infrastructure/database/dynamo/schemas/user.schema';
+import { UserSchema } from '@/infrastructure/database/dynamodb/schemas/user.schema';
 import { UserRole } from '@/domain/types/user.role';
 
 export class UserDocument extends Item {
