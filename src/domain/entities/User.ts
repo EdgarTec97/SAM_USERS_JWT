@@ -80,13 +80,13 @@ export class User {
       firstName: this.firstName,
       lastName: this.lastName,
       username: this.username,
+      phone: this.phone,
       email: this.email,
       password: this.password,
       age: this.age,
       role: this.role,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-      phone: this.phone
+      updatedAt: this.updatedAt
     };
   }
 

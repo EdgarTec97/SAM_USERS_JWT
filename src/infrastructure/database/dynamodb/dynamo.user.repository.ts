@@ -42,7 +42,7 @@ export class DynamoUserRepository implements UserRepository {
     await document.save();
   }
 
-  async getUserById(userId: string): Promise<User | undefined> {
+  async getUserById(userId: string): Promise<User> {
     const document: UserDocument | undefined = await this.model.get(userId);
 
     if (!document) throw new UserNotFound(userId);
