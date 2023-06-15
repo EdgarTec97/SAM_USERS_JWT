@@ -1,13 +1,13 @@
 import { APIGatewayProxyResult, APIGatewayEvent, Handler } from 'aws-lambda';
-import { User, UserPrimitives } from '@/domain/User';
+import { User, UserPrimitives } from '@/domain/entities/User';
 import { IDPathParameterMissing } from '@/domain/errors/IDPathParameterMissing';
 import {
   formatErrorResponse,
   formatJSONResponse
 } from '@/libs/formatJSONResponse';
-import middify from '@/libs/middify';
-import HttpStatus from '@/libs/types/HttpStatus';
-import { GlobalFunctions } from '@/libs/utils';
+import middify from '@/infrastructure/middlewares/middify';
+import HttpStatus from '@/domain/types/HttpStatus';
+import { GlobalFunctions } from '@/infrastructure/utils';
 import { UserResponseDTO } from '@/functions/dtos/user-response.dto';
 
 const getUseById = async (

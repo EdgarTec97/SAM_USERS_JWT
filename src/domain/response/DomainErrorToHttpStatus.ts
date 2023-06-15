@@ -1,5 +1,5 @@
 import { DomainErrorCode } from '@/domain/errors/DomainErrorCode';
-import HttpStatus from '@/libs/types/HttpStatus';
+import HttpStatus from '@/domain/types/HttpStatus';
 
 export const DomainErrorToHttpStatus: Record<DomainErrorCode, HttpStatus> = {
   [DomainErrorCode.BODY_ERROR]: HttpStatus.BAD_REQUEST,

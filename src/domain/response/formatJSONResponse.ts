@@ -1,6 +1,6 @@
 import { DomainError } from '@/domain/errors/DomainError';
-import { DomainErrorToHttpStatus } from '@/libs/DomainErrorToHttpStatus';
-import HttpStatus from '@/libs/types/HttpStatus';
+import { DomainErrorToHttpStatus } from '@/domain/response/DomainErrorToHttpStatus';
+import HttpStatus from '@/domain/types/HttpStatus';
 
 export const formatJSONResponse = (
   statusCode: HttpStatus,

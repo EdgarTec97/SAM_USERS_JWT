@@ -1,5 +1,5 @@
 import { IsString } from 'class-validator';
-import { User } from '@/domain/User';
+import { User } from '@/domain/entities/User';
 
 export class UserResponseDTO {
   @IsString()

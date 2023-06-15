@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  user-api
+  users-microservice
 
-  Sample SAM Template for user-api
+  Sample SAM Template for users-microservice
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -13,7 +13,7 @@ Globals:
       Variables:
         TABLE_NAME: !Ref TableName
         DEPLOY_ENVIRONMENT: !Ref DeployEnviroment
-        #AWS_REGION: !Ref AWSRegion
+        AWS_REGION: !Ref AWSRegion
         IS_OFFLINE: !Ref IsOffline #change this to false for deploy in aws or true for use in offline
         DYNAMOHOST: !Ref DynamoHost
         DYNAMO_PORT: 4566
@@ -36,7 +36,7 @@ Resources:
       AttributeDefinitions:
         # Defining table attributes
         - AttributeName: id
-          AttributeType: N
+          AttributeType: S
         - AttributeName: username
           AttributeType: S
         - AttributeName: email
