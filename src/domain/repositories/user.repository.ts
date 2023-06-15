@@ -1,8 +1,9 @@
 import { User } from '@/domain/entities/User';
+import { UserId } from '@/domain/entities/value-objects/user.id';
 
 export interface UserRepository {
   createOrUpdate(user: User): Promise<void>;
-  getUserById(userId: string): Promise<User>;
+  getUserById(userId: UserId): Promise<User>;
   getUser(): Promise<User[]>;
-  deleteUser(userId: string): Promise<void>;
+  deleteUser(userId: UserId): Promise<void>;
 }

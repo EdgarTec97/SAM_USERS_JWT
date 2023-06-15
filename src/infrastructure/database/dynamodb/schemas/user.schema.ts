@@ -20,8 +20,7 @@ export const UserSchema = new Schema(
       required: true,
       index: {
         name: 'UsernameIndex',
-        type: 'global',
-        project: true
+        type: 'global'
       }
     },
     email: {
@@ -29,8 +28,7 @@ export const UserSchema = new Schema(
       required: true,
       index: {
         name: 'EmailIndex',
-        type: 'global',
-        project: true
+        type: 'global'
       }
     },
     password: {

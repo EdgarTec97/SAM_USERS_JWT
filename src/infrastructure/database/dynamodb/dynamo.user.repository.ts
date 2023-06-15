@@ -3,6 +3,7 @@ import AWS from 'aws-sdk';
 import { User, UserPrimitives } from '@/domain/entities/User';
 import { UserRepository } from '@/domain/repositories/user.repository';
 import { UserNotFound } from '@/domain/errors/UserNotFound';
+import { UserId } from '@/domain/entities/value-objects/user.id';
 import {
   UserModel,
   UserDocument
@@ -42,16 +43,18 @@ export class DynamoUserRepository implements UserRepository {
     await document.save();
   }
 
-  async getUserById(userId: string): Promise<User> {
-    const document: UserDocument | undefined = await this.model.get(userId);
+  async getUserById(userId: UserId): Promise<User> {
+    const document: UserDocument | undefined = (
+      await this.model.query('id').eq(userId.valueOf()).limit(1).exec()
+    ).pop(); // this.model.get(userId) // in case of use only primary key (individual partition)
 
-    if (!document) throw new UserNotFound(userId);
+    if (!document) throw new UserNotFound(userId.valueOf());
 
     return User.fromPrimitives((<unknown>document) as UserPrimitives);
   }
 
-  async deleteUser(userId: string): Promise<void> {
-    const document = await this.model.get(userId);
+  async deleteUser(userId: UserId): Promise<void> {
+    const document = await this.model.get(userId.valueOf());
     await document.delete();
   }
 }

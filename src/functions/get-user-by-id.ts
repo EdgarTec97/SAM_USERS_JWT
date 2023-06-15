@@ -4,6 +4,7 @@ import {
   formatErrorResponse,
   formatJSONResponse
 } from '@/domain/response/formatJSONResponse';
+import { UserId } from '@/domain/entities/value-objects/user.id';
 import { DomainError } from '@/domain/errors/DomainError';
 import middify from '@/infrastructure/middlewares/middify';
 import HttpStatus from '@/domain/types/HttpStatus';
@@ -16,7 +17,7 @@ const getUseById = async (
     const userId = event.pathParameters?.userId;
     if (!userId) return formatErrorResponse(new IDPathParameterMissing());
 
-    const user = await UserRepository.getUserById(userId);
+    const user = await UserRepository.getUserById(new UserId(userId));
 
     return formatJSONResponse(HttpStatus.OK, {
       success: true,

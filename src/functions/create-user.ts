@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult, Handler } from 'aws-lambda';
-import { User } from '@/domain/entities/User';
+import { User, UserPrimitives } from '@/domain/entities/User';
 import {
   formatErrorResponse,
   formatJSONResponse
@@ -11,8 +11,6 @@ import { CreateUserDTO } from '@/functions/dtos/create-user.dto';
 import HttpStatus from '@/domain/types/HttpStatus';
 import { DomainError } from '@/domain/errors/DomainError';
 import { UserRepository } from '@/infrastructure/database';
-
-declare const process: any;
 
 const createUser = async (
   event: RequestDTO<CreateUserDTO>
@@ -38,7 +36,9 @@ const createUser = async (
 
     return formatJSONResponse(HttpStatus.CREATED, {
       success: true,
-      user: user.toPrimitives()
+      user: GlobalFunctions.getNewParams<UserPrimitives>(user.toPrimitives(), [
+        'password'
+      ])
     });
   } catch (error: DomainError | any) {
     console.error(error);

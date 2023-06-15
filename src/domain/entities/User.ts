@@ -1,12 +1,12 @@
 import { UserRole } from '@/domain/types/user.role';
 import { InvalidPropertyError } from '@/domain/errors/InvalidPropertyError';
-import { GlobalFunctions } from '@/infrastructure/utils';
+import { UserId } from '@/domain/entities/value-objects/user.id';
 
 export type UserPrimitives = ReturnType<User['toPrimitives']>;
 
 export class User {
   constructor(
-    private id: string,
+    private id: UserId,
     private firstName: string,
     private lastName: string,
     private username: string,
@@ -29,7 +29,7 @@ export class User {
   ) {
     const date = new Date().toISOString();
     return new User(
-      u.id,
+      new UserId(u.id),
       u.firstName,
       u.lastName,
       u.username,
@@ -66,17 +66,11 @@ export class User {
         this.age,
         `You must be of legal age to use this system.`
       );
-
-    if (!GlobalFunctions.uuidValidator(this.id))
-      throw new InvalidPropertyError(
-        this.id,
-        `The id (${this.id}) must be in UUID format.`
-      );
   }
 
   toPrimitives() {
     return {
-      id: this.id,
+      id: this.id.valueOf(),
       firstName: this.firstName,
       lastName: this.lastName,
       username: this.username,
@@ -90,7 +84,7 @@ export class User {
     };
   }
 
-  getId(): string {
+  getId(): UserId {
     return this.id;
   }
 
