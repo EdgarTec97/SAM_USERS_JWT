@@ -24,7 +24,7 @@ export class DynamoUserRepository implements UserRepository {
       );
     }
   }
-  async getUser(): Promise<User[]> {
+  async getUsers(): Promise<User[]> {
     const results = await this.model.scan().exec();
 
     return results.map((result) =>
@@ -32,8 +32,16 @@ export class DynamoUserRepository implements UserRepository {
     );
   }
 
-  async createOrUpdate(user: User): Promise<void> {
+  async createOrUpdate(user: User, save?: boolean): Promise<void> {
     const userPrimitives = user.toPrimitives();
+
+    // if(save){
+    //   const document: UserDocument | undefined = (
+    //     await this.model.query('id').eq(userPrimitives.id).limit(1).exec()
+    //   ).pop(); // this.model.get(userId) // in case of use only primary key (individual partition)
+
+    //   if (!document) throw new UserNotFound(userPrimitives.id);
+    // }
 
     userPrimitives.password = await BcryptLib.getInstance().encryptValue(
       userPrimitives.password,
@@ -54,7 +62,12 @@ export class DynamoUserRepository implements UserRepository {
   }
 
   async deleteUser(userId: UserId): Promise<void> {
-    const document = await this.model.get(userId.valueOf());
+    const document: UserDocument | undefined = (
+      await this.model.query('id').eq(userId.valueOf()).limit(1).exec()
+    ).pop(); // this.model.get(userId) // in case of use only primary key (individual partition)
+
+    if (!document) throw new UserNotFound(userId.valueOf());
+
     await document.delete();
   }
 }

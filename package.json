@@ -9,6 +9,8 @@
     "build": "sam build --beta-features",
     "deploy:production": "sam deploy --template-file template.yaml --stack-name user-service-production --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides TableName=BgUsers DeployEnviroment=prod IsOffline=false DynamoHost=dynamodb.us-east-1.amazonaws.com AWSRegion=us-east-1",
     "delete:production": "sam delete --stack-name user-service-production",
+    "deploy:staging": "sam deploy --template-file template.yaml --stack-name user-service-staging --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides TableName=BgUsers DeployEnviroment=prod IsOffline=false DynamoHost=dynamodb.us-east-1.amazonaws.com AWSRegion=us-east-1",
+    "delete:staging": "sam delete --stack-name user-service-staging",
     "invoke:create": "sam local invoke 'CreateUser' --docker-network sam-user-api -e events/event.json -n .env.json",
     "invoke:update": "sam local invoke 'UpdateUsers' --docker-network sam-user-api -e events/event.json -n .env.json",
     "invoke:getAll": "sam local invoke 'GetUsers' --docker-network sam-user-api -e events/event.json -n .env.json",
