@@ -10,6 +10,7 @@ services:
     image: localstack/localstack:0.12.12
     networks:
       - backend
+    restart: always
     ports:
       - '127.0.0.1:53:53'
       - '127.0.0.1:53:53/udp'

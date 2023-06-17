@@ -20,27 +20,29 @@ export class GlobalFunctions {
   }
 
   static getNewParams<T>(
-    obj: any,
+    obj: T,
     properties: Array<keyof T>,
     validateProperties?: Array<keyof T>
   ) {
     const newObj: any = {};
 
-    const realProperties: Array<string> = Object.keys(
+    const realProperties = Object.keys(
       validateProperties
         ? GlobalFunctions.cleanAllParams<T>(obj, validateProperties)
         : obj
-    ); //{id: 2, name: "E"} => ["id","name"]
+    ) as Array<keyof T>; //{id: 2, name: "E"} => ["id","name"]
 
-    realProperties.forEach((property: string) => {
+    realProperties.forEach((property) => {
       if (!properties.find((prop) => prop == property)) {
         const value = obj[property];
         newObj[property] =
-          typeof value == 'object' ? structuredClone({}, obj[property]) : value;
+          typeof value == 'object'
+            ? structuredClone({}, obj[property] as object)
+            : value;
       }
     });
 
-    return newObj;
+    return newObj as T;
   }
 
   private static cleanAllParams<T>(

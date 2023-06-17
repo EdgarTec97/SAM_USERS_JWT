@@ -20,7 +20,8 @@ export const UserSchema = new Schema(
       required: true,
       index: {
         name: 'UsernameIndex',
-        type: 'global'
+        type: 'global',
+        project: true
       }
     },
     email: {
@@ -28,7 +29,8 @@ export const UserSchema = new Schema(
       required: true,
       index: {
         name: 'EmailIndex',
-        type: 'global'
+        type: 'global',
+        project: true
       }
     },
     password: {
@@ -41,8 +43,7 @@ export const UserSchema = new Schema(
     },
     age: {
       type: Number,
-      required: true,
-      rangeKey: true
+      required: true
     },
     role: {
       type: String,
@@ -53,14 +54,15 @@ export const UserSchema = new Schema(
       default: true
     },
     createdAt: {
-      type: String,
+      type: Number,
       required: true,
-      default: new Date().toISOString()
+      default: Date.now(),
+      rangeKey: true
     },
     updatedAt: {
-      type: String,
+      type: Number,
       required: true,
-      default: new Date().toISOString()
+      default: Date.now()
     }
   },
   {

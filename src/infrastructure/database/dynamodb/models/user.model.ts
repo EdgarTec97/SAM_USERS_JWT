@@ -15,8 +15,8 @@ export class UserDocument extends Item {
   age!: number;
   role!: UserRole;
   active!: boolean;
-  createdAt!: string;
-  updatedAt!: string;
+  createdAt!: number;
+  updatedAt!: number;
 }
 
 export const UserModel = model<UserDocument>(

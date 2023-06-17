@@ -32,7 +32,7 @@ const createUser = async (
       role: body.role
     });
 
-    await UserRepository.createOrUpdate(user);
+    await UserRepository.createOrUpdate(user, true);
 
     return formatJSONResponse(HttpStatus.CREATED, {
       success: true,
