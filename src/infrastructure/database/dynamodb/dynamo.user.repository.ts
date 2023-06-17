@@ -72,14 +72,16 @@ export class DynamoUserRepository implements UserRepository {
       .concat(resultByUsername)
       .pop();
 
-    // Create workflow
-    if (save) {
-      if (userFound) throw new UserExistsError();
-
+    // Validate the password to update method
+    if (userPrimitives.password)
       userPrimitives.password = await BcryptLib.getInstance().encryptValue(
         userPrimitives.password,
         2
       );
+
+    // Create workflow
+    if (save) {
+      if (userFound) throw new UserExistsError();
 
       const document = new this.model(
         GlobalFunctions.getNewParams(userPrimitives, ['createdAt', 'updatedAt'])
@@ -87,31 +89,22 @@ export class DynamoUserRepository implements UserRepository {
       await document.save();
       return;
     }
-
     // Update workflow
-    const document: UserDocument | undefined = (
-      await this.model.query('id').eq(userPrimitives.id).limit(1).exec()
-    ).pop(); // this.model.get(userId) // in case of use only primary key (individual partition)
-
-    if (!document) throw new UserNotFound(userPrimitives.id);
-
     if (
       userFound &&
-      userFound.id !== document.id &&
+      userFound.id !== userPrimitives.id &&
       (userPrimitives.email == userFound.email ||
         userPrimitives.username == userFound.email)
     )
       throw new UserExistsError();
 
-    if (userPrimitives.password)
-      document.password = await BcryptLib.getInstance().encryptValue(
-        userPrimitives.password,
-        2
-      );
-
-    document.updatedAt = Date.now();
-
-    await document.save();
+    await this.model.update({
+      ...GlobalFunctions.getNewParams<any>(userPrimitives, [
+        'createdAt',
+        'updatedAt'
+      ]),
+      updatedAt: Date.now()
+    });
   }
 
   async getUserById(userId: UserId): Promise<User> {

@@ -5,7 +5,7 @@ import { UserSchema } from '@/infrastructure/database/dynamodb/schemas/user.sche
 import { UserRole } from '@/domain/types/user.role';
 
 export class UserDocument extends Item {
-  id!: number;
+  id!: string;
   firstName!: string;
   lastName!: string;
   username!: string;
