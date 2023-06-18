@@ -3,6 +3,10 @@ import { UserId } from '@/domain/entities/value-objects/user.id';
 import { UsersResponse } from '@/domain/types/response';
 
 export interface UserRepository {
+  login(
+    { email, username }: { email?: string; username?: string },
+    password: string
+  ): Promise<string>;
   createOrUpdate(user: User, save?: boolean): Promise<void>;
   getUserById(userId: UserId): Promise<User>;
   getUsers(page: number, pageSize: number): Promise<UsersResponse>;

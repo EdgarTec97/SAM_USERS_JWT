@@ -2,6 +2,8 @@ declare const process: any;
 
 export const config = {
   deployEnvironment: process.env.DEPLOY_ENVIRONMENT || 'dev',
+  secretKey: process.env.SECRET_KEY || 'shhh',
+  expiration: Number(process.env.EXPIRATION || 0),
   aws: {
     dynamoDB: {
       users: {

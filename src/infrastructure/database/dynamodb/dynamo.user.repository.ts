@@ -13,6 +13,7 @@ import { BcryptLib } from '@/infrastructure/utils/encrypt.lib';
 import { UserExistsError } from '@/domain/errors/UserExistsError';
 import { GlobalFunctions } from '@/infrastructure/utils';
 import { UsersResponse } from '@/domain/types/response';
+import { JSONWebTokenAuth } from '@/infrastructure/utils/jwt.lib';
 
 export class DynamoUserRepository implements UserRepository {
   private readonly model = UserModel;
@@ -153,5 +154,36 @@ export class DynamoUserRepository implements UserRepository {
     if (!document) throw new UserNotFound(userId.valueOf());
 
     await document.delete();
+  }
+
+  async login(
+    { email, username }: { email?: string; username?: string },
+    password: string
+  ): Promise<string> {
+    let userFound: UserDocument | undefined;
+
+    const finding = async (property: string, value: string) =>
+      (await this.model.query({ [property]: value }).exec()).pop();
+
+    if (username) userFound = await finding('username', username);
+    if (email && !userFound) userFound = await finding('email', email);
+
+    if (!userFound)
+      throw new UserNotFound('', 'User not found: Incorrect credentials');
+
+    const verifyPassword = await BcryptLib.getInstance().verifyEncryptValue(
+      password,
+      userFound.password
+    );
+
+    if (!verifyPassword)
+      throw new UserNotFound('', 'User not found: Incorrect credentials');
+
+    return JSONWebTokenAuth.getInstance().sign(userFound, [
+      'createdAt',
+      'updatedAt',
+      'password',
+      'active'
+    ]);
   }
 }

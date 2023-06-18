@@ -4,7 +4,7 @@ import { DomainErrorCode } from '@/domain/errors/DomainErrorCode';
 export class UserNotFound extends DomainError {
   public domainErrorCode = DomainErrorCode.USER_NOT_FOUND;
 
-  constructor(userId: string) {
-    super(`User with id ${userId} was not found`);
+  constructor(userId: string, message?: string) {
+    super(message || `User with id ${userId} was not found`);
   }
 }
