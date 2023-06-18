@@ -55,4 +55,12 @@ export class GlobalFunctions {
 
     return obj;
   }
+
+  static removeFalsyProperties<T>(obj: T) {
+    const result: Partial<T> = {};
+    for (const property in obj) {
+      if (property !== undefined) result[property] = obj[property];
+    }
+    return result;
+  }
 }

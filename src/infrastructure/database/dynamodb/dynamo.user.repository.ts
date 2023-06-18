@@ -1,4 +1,4 @@
-import { aws, Condition } from 'dynamoose';
+import { aws } from 'dynamoose';
 import AWS from 'aws-sdk';
 import { User, UserPrimitives } from '@/domain/entities/User';
 import { UserRepository } from '@/domain/repositories/user.repository';
@@ -68,9 +68,7 @@ export class DynamoUserRepository implements UserRepository {
       queryByUsername
     ]);
 
-    const userFound: UserDocument | undefined = resultByEmail
-      .concat(resultByUsername)
-      .pop();
+    const usersFound: UserDocument[] = resultByEmail.concat(resultByUsername);
 
     // Validate the password to update method
     if (userPrimitives.password)
@@ -81,7 +79,7 @@ export class DynamoUserRepository implements UserRepository {
 
     // Create workflow
     if (save) {
-      if (userFound) throw new UserExistsError();
+      if (usersFound.pop()) throw new UserExistsError();
 
       const document = new this.model(
         GlobalFunctions.getNewParams(userPrimitives, ['createdAt', 'updatedAt'])
@@ -90,21 +88,27 @@ export class DynamoUserRepository implements UserRepository {
       return;
     }
     // Update workflow
-    if (
-      userFound &&
-      userFound.id !== userPrimitives.id &&
-      (userPrimitives.email == userFound.email ||
-        userPrimitives.username == userFound.email)
-    )
-      throw new UserExistsError();
+    const userFound = usersFound.some(
+      (userF) =>
+        userF.id !== userPrimitives.id &&
+        (userPrimitives.email == userF.email ||
+          userPrimitives.username == userF.username)
+    );
+    if (userFound) throw new UserExistsError();
 
-    await this.model.update({
-      ...GlobalFunctions.getNewParams<any>(userPrimitives, [
-        'createdAt',
-        'updatedAt'
-      ]),
-      updatedAt: Date.now()
-    });
+    await this.model.update(
+      { id: userPrimitives.id, createdAt: userPrimitives.createdAt },
+      {
+        ...GlobalFunctions.removeFalsyProperties(
+          GlobalFunctions.getNewParams<any>(userPrimitives, [
+            'id',
+            'createdAt',
+            'updatedAt'
+          ])
+        ),
+        updatedAt: Date.now()
+      }
+    );
   }
 
   async getUserById(userId: UserId): Promise<User> {
