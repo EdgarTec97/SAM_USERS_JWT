@@ -12,7 +12,7 @@ const getUsers = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const { page, pageSize } = <any>event.queryStringParameters;
+    const { page, pageSize } = <any>(event.queryStringParameters || {});
     const data = await UserRepository.getUsers(
       Number(page || 1),
       Number(pageSize || 10)
