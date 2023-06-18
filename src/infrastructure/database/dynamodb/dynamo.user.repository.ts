@@ -11,7 +11,8 @@ import {
 import { config } from '@/infrastructure/config';
 import { BcryptLib } from '@/infrastructure/utils/encrypt.lib';
 import { UserExistsError } from '@/domain/errors/UserExistsError';
-import { GlobalFunctions } from '../../utils';
+import { GlobalFunctions } from '@/infrastructure/utils';
+import { UsersResponse } from '@/domain/types/response';
 
 export class DynamoUserRepository implements UserRepository {
   private readonly model = UserModel;
@@ -26,16 +27,35 @@ export class DynamoUserRepository implements UserRepository {
       );
     }
   }
-  async getUsers(): Promise<User[]> {
+  async getUsers(page: number, pageSize: number): Promise<UsersResponse> {
     const results = await this.model.scan().exec();
 
-    return results.map((result) =>
-      User.fromPrimitives((<unknown>{
-        ...result,
-        createdAt: new Date(result.createdAt).toISOString(),
-        updatedAt: new Date(result.updatedAt).toISOString()
-      }) as UserPrimitives)
-    );
+    let users: UserPrimitives[] = results.sort(
+      (userA, userB) => userB.createdAt - userA.createdAt
+    ) as any;
+
+    const size = users.length;
+
+    users = users.splice((page - 1) * pageSize, pageSize);
+
+    const totalPages = size / users.length;
+    const floor = Math.floor(totalPages);
+
+    return {
+      page,
+      itemsByPage: pageSize,
+      usersSize: users.length,
+      totalUsers: size,
+      totalPages:
+        users.length < pageSize ? page : floor < totalPages ? floor + 1 : floor,
+      users: users.map((user) =>
+        User.fromPrimitives((<unknown>{
+          ...user,
+          createdAt: new Date(user.createdAt).toISOString(),
+          updatedAt: new Date(user.updatedAt).toISOString()
+        }) as UserPrimitives)
+      )
+    };
   }
 
   async createOrUpdate(user: User, save?: boolean): Promise<void> {

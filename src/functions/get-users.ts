@@ -12,11 +12,16 @@ const getUsers = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const users = await UserRepository.getUsers();
+    const { page, pageSize } = <any>event.queryStringParameters;
+    const data = await UserRepository.getUsers(
+      Number(page || 1),
+      Number(pageSize || 10)
+    );
 
     return formatJSONResponse(HttpStatus.OK, {
       success: true,
-      users: users.map((user) => user.toPrimitives())
+      ...data,
+      users: data.users.map((user) => user.toPrimitives())
     });
   } catch (error: DomainError | any) {
     console.error(error);
