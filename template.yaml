@@ -13,11 +13,11 @@ Globals:
       Variables:
         TABLE_NAME: !Ref TableName
         DEPLOY_ENVIRONMENT: !Ref DeployEnviroment
-        AWS_REGION: !Ref AWSRegion
+        #AWS_REGION: !Ref AWSRegion
         IS_OFFLINE: !Ref IsOffline #change this to false for deploy in aws or true for use in offline
         DYNAMOHOST: !Ref DynamoHost
         DYNAMO_PORT: 4566
-        SECRET_KEY: !Ref SecretKey,
+        SECRET_KEY: !Ref SecretKey
         EXPIRATION: !Ref Expiration
 
 Parameters:
