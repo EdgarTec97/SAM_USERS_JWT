@@ -6,10 +6,11 @@
   "license": "ISC",
   "scripts": {
     "start": "yarn build && sam local start-api --docker-network sam-user-api -n .env.json",
+    "start:prod": "yarn build && sam local start-api --template-file .aws-sam/build/template.yaml --docker-network sam-user-api -n .env.json",
     "build": "sam build --beta-features",
-    "deploy:production": "sam deploy --template-file template.yaml --stack-name user-service-production --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides TableName=BgUsers DeployEnviroment=prod IsOffline=false DynamoHost=dynamodb.us-east-1.amazonaws.com AWSRegion=us-east-1 Expiration=2 SecretKey=shhh",
+    "deploy:production": "sam deploy --template-file .aws-sam/build/template.yaml --stack-name user-service-production --s3-bucket user-bags-service-production --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides TableName=BgUsers DeployEnviroment=prod IsOffline=false DynamoHost=dynamodb.us-east-1.amazonaws.com AWSRegion=us-east-1 Expiration=2 SecretKey=shhh",
     "delete:production": "sam delete --stack-name user-service-production",
-    "deploy:staging": "sam deploy --template-file template.yaml --stack-name user-service-staging --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides TableName=BgUsers DeployEnviroment=prod IsOffline=false DynamoHost=dynamodb.us-east-1.amazonaws.com AWSRegion=us-east-1 Expiration=2 SecretKey=shhh",
+    "deploy:staging": "sam deploy --template-file .aws-sam/build/template.yaml --stack-name user-service-staging --s3-bucket user-bags-service-staging --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides TableName=BgUsers DeployEnviroment=prod IsOffline=false DynamoHost=dynamodb.us-east-1.amazonaws.com AWSRegion=us-east-1 Expiration=2 SecretKey=shhh",
     "delete:staging": "sam delete --stack-name user-service-staging",
     "invoke:create": "sam local invoke 'CreateUser' --docker-network sam-user-api -e events/event.json -n .env.json",
     "invoke:update": "sam local invoke 'UpdateUsers' --docker-network sam-user-api -e events/event.json -n .env.json",
