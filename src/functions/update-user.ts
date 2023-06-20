@@ -12,6 +12,7 @@ import { UpdateUserDTO } from '@/functions/dtos/update-user.dto';
 import HttpStatus from '@/domain/types/HttpStatus';
 import { DomainError } from '@/domain/errors/DomainError';
 import { UserRepository } from '@/infrastructure/database';
+import { BASIC } from '@/domain/types/user.role';
 
 const updateUser = async (
   event: RequestDTO<UpdateUserDTO>
@@ -57,4 +58,4 @@ const updateUser = async (
   }
 };
 
-export const handler: Handler = middify(updateUser, UpdateUserDTO);
+export const handler: Handler = middify(updateUser, UpdateUserDTO, BASIC);

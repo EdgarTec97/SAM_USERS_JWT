@@ -9,15 +9,18 @@ import { DomainError } from '@/domain/errors/DomainError';
 import middify from '@/infrastructure/middlewares/middify';
 import HttpStatus from '@/domain/types/HttpStatus';
 import { UserRepository } from '@/infrastructure/database';
+import { ADMINISTRATORS } from '@/domain/types/user.role';
 
 const deleteUser = async (
-  event: APIGatewayEvent
+  event: APIGatewayEvent & { body: any }
 ): Promise<APIGatewayProxyResult> => {
+  if (event.body instanceof DomainError) return formatErrorResponse(event.body);
+
   try {
     const userId = event.pathParameters?.userId;
     if (!userId) return formatErrorResponse(new IDPathParameterMissing());
 
-    const user = await UserRepository.deleteUser(new UserId(userId));
+    await UserRepository.deleteUser(new UserId(userId));
 
     return formatJSONResponse(HttpStatus.OK, {
       success: true,
@@ -35,4 +38,4 @@ const deleteUser = async (
   }
 };
 
-export const handler: Handler = middify(deleteUser);
+export const handler: Handler = middify(deleteUser, undefined, ADMINISTRATORS);

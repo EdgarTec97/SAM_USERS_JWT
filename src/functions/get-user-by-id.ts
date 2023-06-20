@@ -9,10 +9,13 @@ import { DomainError } from '@/domain/errors/DomainError';
 import middify from '@/infrastructure/middlewares/middify';
 import HttpStatus from '@/domain/types/HttpStatus';
 import { UserRepository } from '@/infrastructure/database';
+import { ALL_ROLES } from '@/domain/types/user.role';
 
 const getUseById = async (
-  event: APIGatewayEvent
+  event: APIGatewayEvent & { body: any }
 ): Promise<APIGatewayProxyResult> => {
+  if (event.body instanceof DomainError) return formatErrorResponse(event.body);
+
   try {
     const userId = event.pathParameters?.userId;
     if (!userId) return formatErrorResponse(new IDPathParameterMissing());
@@ -35,4 +38,4 @@ const getUseById = async (
   }
 };
 
-export const handler: Handler = middify(getUseById);
+export const handler: Handler = middify(getUseById, undefined, ALL_ROLES);

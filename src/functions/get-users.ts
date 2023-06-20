@@ -7,10 +7,13 @@ import { DomainError } from '@/domain/errors/DomainError';
 import middify from '@/infrastructure/middlewares/middify';
 import HttpStatus from '@/domain/types/HttpStatus';
 import { UserRepository } from '@/infrastructure/database';
+import { ADMINISTRATORS } from '@/domain/types/user.role';
 
 const getUsers = async (
-  event: APIGatewayEvent
+  event: APIGatewayEvent & { body: any }
 ): Promise<APIGatewayProxyResult> => {
+  if (event.body instanceof DomainError) return formatErrorResponse(event.body);
+
   try {
     const { page, pageSize } = <any>(event.queryStringParameters || {});
     const data = await UserRepository.getUsers(
@@ -35,4 +38,4 @@ const getUsers = async (
   }
 };
 
-export const handler: Handler = middify(getUsers);
+export const handler: Handler = middify(getUsers, undefined, ADMINISTRATORS);

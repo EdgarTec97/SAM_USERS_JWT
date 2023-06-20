@@ -25,7 +25,7 @@ const loginUser = async (
 
     return formatJSONResponse(HttpStatus.CREATED, {
       success: true,
-      access_tokeb: token
+      access_token: token
     });
   } catch (error: DomainError | any) {
     console.error(error);

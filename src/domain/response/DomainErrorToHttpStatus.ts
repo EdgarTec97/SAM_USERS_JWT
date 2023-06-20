@@ -8,5 +8,7 @@ export const DomainErrorToHttpStatus: Record<DomainErrorCode, HttpStatus> = {
   [DomainErrorCode.INVALID_PROPERTY]: HttpStatus.BAD_REQUEST,
   [DomainErrorCode.USER_NOT_FOUND]: HttpStatus.NOT_FOUND,
   [DomainErrorCode.ID_PATH_PARAMETER_MISSING]: HttpStatus.BAD_REQUEST,
-  [DomainErrorCode.USER_EXISTS]: HttpStatus.BAD_REQUEST
+  [DomainErrorCode.USER_EXISTS]: HttpStatus.BAD_REQUEST,
+  [DomainErrorCode.UNAUTHORIZED_CLIENT]: HttpStatus.UNAUTHORIZED,
+  [DomainErrorCode.MISSING_HEADERS]: HttpStatus.FORBIDDEN
 };
