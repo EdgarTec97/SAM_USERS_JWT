@@ -35,63 +35,97 @@ Parameters:
     Type: String
 
 Resources:
+  # Define an SNS topic for User Service notifications
   TopicUserService:
     Type: 'AWS::SNS::Topic'
     Properties:
-      DisplayName: TopicUserService 
+      # Set the display name for the SNS topic
+      DisplayName: TopicUserService
+      # Set the name of the SNS topic
       TopicName: TopicUserService
+      # Use the default AWS managed key for SNS encryption
       KmsMasterKeyId: alias/aws/sns
+      # Configure the delivery policies for the SNS topic
       DeliveryPolicy:
+        # Configure the default retry policy for HTTP endpoints
         HTTP:
+          # Set the minimum delay for retries (in seconds)
           defaultHealthyRetryPolicy:
             minDelayTarget: 20
+          # Set the maximum delay for retries (in seconds)
             maxDelayTarget: 20
+          # Set the number of retries to be attempted
             numRetries: 3
-            numMaxDelayRetries: 0
+          # Set the number of retries without delay
             numNoDelayRetries: 0
+          # Set the backoff function for retries (linear, exponential, etc.)
             backoffFunction: linear
+          # Disable subscription overrides for the default retry policy
           disableSubscriptionOverrides: false
+          # Configure the default throttle policy for HTTP endpoints
           defaultThrottlePolicy:
+            # Set the maximum number of receives per second
             maxReceivesPerSecond: 1
+          # Disable subscription overrides for the default throttle policy
           disableSubscriptionOverrides: false
+        # Configure the default retry policy for HTTPS endpoints (similar to HTTP)
         HTTPS:
           defaultHealthyRetryPolicy:
             minDelayTarget: 20
             maxDelayTarget: 20
             numRetries: 3
-            numMaxDelayRetries: 0
             numNoDelayRetries: 0
             backoffFunction: linear
           disableSubscriptionOverrides: false
           defaultThrottlePolicy:
             maxReceivesPerSecond: 1
           disableSubscriptionOverrides: false
+      # Add tags to the SNS topic (e.g., for identifying the environment)
       Tags:
         - Key: Environment
           Value: Production
+
+  # Define an SQS queue for User Service messages
   UserQueue:
     Type: 'AWS::SQS::Queue'
     Properties:
+      # Set the name of the SQS queue
       QueueName: UserQueue
-      VisibilityTimeout: 300 
-      MaximumMessageSize: 2048 
-      MessageRetentionPeriod: 86400 
+      # Set the visibility timeout (in seconds) for messages in the queue
+      VisibilityTimeout: 300
+      # Set the maximum message size (in bytes) for the queue
+      MaximumMessageSize: 2048
+      # Set the message retention period (in seconds) for the queue
+      MessageRetentionPeriod: 86400
+      # Set the dead-letter queue configuration for the queue
       RedrivePolicy:
-        deadLetterTargetArn: !GetAtt UserDeadLetterQueue.Arn 
+        # Set the Amazon Resource Name (ARN) of the dead-letter queue
+        deadLetterTargetArn: !GetAtt UserDeadLetterQueue.Arn
+        # Set the maximum number of receives before moving messages to the dead-letter queue
         maxReceiveCount: 5
+      # Add tags to the SQS queue (e.g., for identifying the environment)
       Tags:
         - Key: Environment
           Value: Production
+
+  # Define an SQS dead-letter queue for User Service messages
   UserDeadLetterQueue:
     Type: 'AWS::SQS::Queue'
     Properties:
-      QueueName: UserDeadLetterQueue 
+      # Set the name of the dead-letter queue
+      QueueName: UserDeadLetterQueue
+      # Set the message retention period (in seconds) for the dead-letter queue
       MessageRetentionPeriod: 1209600
+
+  # Subscribe the SQS queue to the SNS topic
   MySQSToSNSSubscription:
     Type: 'AWS::SNS::Subscription'
     Properties:
+      # Set the protocol to 'sqs' for the SQS endpoint
       Protocol: 'sqs'
+      # Reference the ARN of the SNS topic to subscribe to
       TopicArn: !Ref TopicUserService
+      # Reference the ARN of the SQS queue as the endpoint for the subscription
       Endpoint: !GetAtt UserQueue.Arn
   UserTable:
     Type: AWS::DynamoDB::Table
