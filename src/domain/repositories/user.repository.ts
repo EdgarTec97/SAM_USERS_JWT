@@ -7,7 +7,7 @@ export interface UserRepository {
     { email, username }: { email?: string; username?: string },
     password: string
   ): Promise<string>;
-  createOrUpdate(user: User, save?: boolean): Promise<void>;
+  createOrUpdate(user: User, save?: boolean, password?: string): Promise<void>;
   getUserById(userId: UserId): Promise<User>;
   getUsers(page: number, pageSize: number): Promise<UsersResponse>;
   deleteUser(userId: UserId): Promise<void>;

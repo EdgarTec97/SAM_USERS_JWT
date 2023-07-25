@@ -59,7 +59,11 @@ export class DynamoUserRepository implements UserRepository {
     };
   }
 
-  async createOrUpdate(user: User, save?: boolean): Promise<void> {
+  async createOrUpdate(
+    user: User,
+    save?: boolean,
+    password?: string
+  ): Promise<void> {
     const userPrimitives = user.toPrimitives();
 
     // const condition = new Condition().where('email').eq(userPrimitives.email).or().where('username').eq(userPrimitives.username);
@@ -92,11 +96,9 @@ export class DynamoUserRepository implements UserRepository {
     const usersFound: UserDocument[] = resultByEmail.concat(resultByUsername);
 
     // Validate the password to update method
-    if (userPrimitives.password)
-      userPrimitives.password = await BcryptLib.getInstance().encryptValue(
-        userPrimitives.password,
-        2
-      );
+    userPrimitives.password = userPrimitives.password
+      ? await BcryptLib.getInstance().encryptValue(userPrimitives.password, 2)
+      : password!;
 
     // Create workflow
     if (save) {

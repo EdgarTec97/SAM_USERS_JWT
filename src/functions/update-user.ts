@@ -37,10 +37,10 @@ const updateUser = async (
       password: body?.password,
       age: body?.age || userExists.getAge(),
       role: body?.role || userExists.getRole(),
-      createdAt: <string>(<unknown>Date.parse(userExists.getCreatedAt()))
+      createdAt: userExists.getCreatedAt()
     });
 
-    await UserRepository.createOrUpdate(user, false);
+    await UserRepository.createOrUpdate(user, false, userExists.getPassword());
 
     return formatJSONResponse(HttpStatus.CREATED, {
       success: true,
