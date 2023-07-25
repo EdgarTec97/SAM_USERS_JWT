@@ -1,5 +1,11 @@
 import { aws } from 'dynamoose';
 import AWS from 'aws-sdk';
+import {
+  SNSClient,
+  PublishCommand,
+  SNSClientConfig,
+  PublishCommandInput
+} from '@aws-sdk/client-sns';
 import { User, UserPrimitives } from '@/domain/entities/User';
 import { UserRepository } from '@/domain/repositories/user.repository';
 import { UserNotFound } from '@/domain/errors/UserNotFound';
@@ -19,15 +25,24 @@ export class DynamoUserRepository implements UserRepository {
   private readonly model = UserModel;
 
   private readonly region = config.aws.region;
+  private snsClient: SNSClient;
+
   constructor() {
     AWS.config.update({ region: this.region });
 
+    const SnSConfig: SNSClientConfig = {
+      region: this.region
+    };
+
     if (config.isOffline) {
-      aws.ddb.local(
-        `http://${config.aws.dynamoDB.users.host}:${config.aws.dynamoDB.users.port}`
-      );
+      const endpoint = `http://${config.aws.dynamoDB.users.host}:${config.aws.dynamoDB.users.port}`;
+      aws.ddb.local(endpoint);
+      SnSConfig.endpoint = endpoint;
     }
+
+    this.snsClient = new SNSClient(SnSConfig);
   }
+
   async getUsers(page: number, pageSize: number): Promise<UsersResponse> {
     const results = await this.model.scan().exec();
 
@@ -180,6 +195,20 @@ export class DynamoUserRepository implements UserRepository {
 
     if (!verifyPassword)
       throw new UserNotFound('', 'User not found: Incorrect credentials');
+
+    const params: PublishCommandInput = {
+      TopicArn: config.aws.userTopic,
+      Message: JSON.stringify({ user: userFound })
+    };
+
+    try {
+      await this.snsClient.send(new PublishCommand(params));
+      console.log('Message sent to SNS topic.');
+    } catch (error: any) {
+      console.error(
+        `Error publishing message to SNS topic: ${error.toString()}`
+      );
+    }
 
     return JSONWebTokenAuth.getInstance().sign(userFound, [
       'createdAt',

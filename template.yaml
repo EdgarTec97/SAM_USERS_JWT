@@ -35,6 +35,64 @@ Parameters:
     Type: String
 
 Resources:
+  TopicUserService:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      DisplayName: TopicUserService 
+      TopicName: TopicUserService
+      KmsMasterKeyId: alias/aws/sns
+      DeliveryPolicy:
+        HTTP:
+          defaultHealthyRetryPolicy:
+            minDelayTarget: 20
+            maxDelayTarget: 20
+            numRetries: 3
+            numMaxDelayRetries: 0
+            numNoDelayRetries: 0
+            backoffFunction: linear
+          disableSubscriptionOverrides: false
+          defaultThrottlePolicy:
+            maxReceivesPerSecond: 1
+          disableSubscriptionOverrides: false
+        HTTPS:
+          defaultHealthyRetryPolicy:
+            minDelayTarget: 20
+            maxDelayTarget: 20
+            numRetries: 3
+            numMaxDelayRetries: 0
+            numNoDelayRetries: 0
+            backoffFunction: linear
+          disableSubscriptionOverrides: false
+          defaultThrottlePolicy:
+            maxReceivesPerSecond: 1
+          disableSubscriptionOverrides: false
+      Tags:
+        - Key: Environment
+          Value: Production
+  UserQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: UserQueue
+      VisibilityTimeout: 300 
+      MaximumMessageSize: 2048 
+      MessageRetentionPeriod: 86400 
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt UserDeadLetterQueue.Arn 
+        maxReceiveCount: 5
+      Tags:
+        - Key: Environment
+          Value: Production
+  UserDeadLetterQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: UserDeadLetterQueue 
+      MessageRetentionPeriod: 1209600
+  MySQSToSNSSubscription:
+    Type: 'AWS::SNS::Subscription'
+    Properties:
+      Protocol: 'sqs'
+      TopicArn: !Ref TopicUserService
+      Endpoint: !GetAtt UserQueue.Arn
   UserTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -213,14 +271,44 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref TableName
+        - SNSPublishMessagePolicy:
+            TopicName: !Ref TopicUserService
       Architectures:
         - x86_64
+      Environment:
+        Variables:
+          TOPIC_ARN: !Ref TopicUserService
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /login
             Method: post
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - login.ts
+
+  NotificationUser:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/functions/
+      Handler: notification.handler
+      Runtime: nodejs18.x
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt UserQueue.QueueName
+      Architectures:
+        - x86_64
+      Events:
+        UserQueue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt UserQueue.Arn
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:

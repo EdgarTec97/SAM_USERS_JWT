@@ -15,11 +15,10 @@ services:
       - '127.0.0.1:53:53'
       - '127.0.0.1:53:53/udp'
       - '127.0.0.1:443:443'
-      - '127.0.0.1:4566:4566'
-      - '127.0.0.1:4571:4571'
+      - '4566-4597:4566-4597'
     environment:
       # - SERVICES=${SERVICES- }
-      - SERVICES=dynamodb,lambda
+      - SERVICES=dynamodb,lambda,sns,sqs
       - DEFAULT_REGION=us-east-1
       # - DEBUG=${DEBUG- }
       - DEBUG=1

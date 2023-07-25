@@ -27,6 +27,7 @@
     "run-checks": "yarn lint && yarn test && yarn compile"
   },
   "dependencies": {
+    "@aws-sdk/client-sns": "^3.377.0",
     "@middy/core": "2.5.3",
     "@middy/http-cors": "2.5.3",
     "@middy/http-json-body-parser": "2.5.3",
