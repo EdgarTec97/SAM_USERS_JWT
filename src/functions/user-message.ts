@@ -10,6 +10,8 @@ const notification = async (event: SQSEvent): Promise<void> => {
   } catch (error: DomainError | any) {
     console.error(error);
   }
+
+  return;
 };
 
 export const handler: Handler = notification;

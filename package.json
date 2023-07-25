@@ -17,6 +17,8 @@
     "invoke:getAll": "sam local invoke 'GetUsers' --docker-network sam-user-api -e events/event.json -n .env.json",
     "invoke:getById": "sam local invoke 'GetUserById' --docker-network sam-user-api -e events/event.json -n .env.json",
     "invoke:delete": "sam local invoke 'DeleteUser' --docker-network sam-user-api -e events/event.json -n .env.json",
+    "invoke:login": "sam local invoke 'LoginUser' --docker-network sam-user-api -e events/event.json -n .env.json",
+    "invoke:noti": "sam local invoke 'NotificationUser' --docker-network sam-user-api -e events/event.json -n .env.json",
     "invoke:all": "yarn invoke:create && yarn invoke:update && yarn invoke:getAll && yarn invoke:getById && yarn invoke:delete",
     "format": "prettier 'src/**/*.ts' --write",
     "compile": "tsc",
