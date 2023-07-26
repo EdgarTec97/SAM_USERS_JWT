@@ -45,41 +45,6 @@ Resources:
       TopicName: TopicUserService
       # Use the default AWS managed key for SNS encryption
       KmsMasterKeyId: alias/aws/sns
-      # Configure the delivery policies for the SNS topic
-      DeliveryPolicy:
-        # Configure the default retry policy for HTTP endpoints
-        HTTP:
-          # Set the minimum delay for retries (in seconds)
-          defaultHealthyRetryPolicy:
-            minDelayTarget: 20
-          # Set the maximum delay for retries (in seconds)
-            maxDelayTarget: 20
-          # Set the number of retries to be attempted
-            numRetries: 3
-          # Set the number of retries without delay
-            numNoDelayRetries: 0
-          # Set the backoff function for retries (linear, exponential, etc.)
-            backoffFunction: linear
-          # Disable subscription overrides for the default retry policy
-          disableSubscriptionOverrides: false
-          # Configure the default throttle policy for HTTP endpoints
-          defaultThrottlePolicy:
-            # Set the maximum number of receives per second
-            maxReceivesPerSecond: 1
-          # Disable subscription overrides for the default throttle policy
-          disableSubscriptionOverrides: false
-        # Configure the default retry policy for HTTPS endpoints (similar to HTTP)
-        HTTPS:
-          defaultHealthyRetryPolicy:
-            minDelayTarget: 20
-            maxDelayTarget: 20
-            numRetries: 3
-            numNoDelayRetries: 0
-            backoffFunction: linear
-          disableSubscriptionOverrides: false
-          defaultThrottlePolicy:
-            maxReceivesPerSecond: 1
-          disableSubscriptionOverrides: false
       # Add tags to the SNS topic (e.g., for identifying the environment)
       Tags:
         - Key: Environment
