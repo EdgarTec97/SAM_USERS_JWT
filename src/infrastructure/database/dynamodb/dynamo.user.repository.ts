@@ -203,7 +203,7 @@ export class DynamoUserRepository implements UserRepository {
 
     try {
       await this.snsClient.send(new PublishCommand(params));
-      console.log('Message sent to SNS topic.');
+      console.info('Message sent to SNS topic.');
     } catch (error: any) {
       console.error(
         `Error publishing message to SNS topic: ${error.toString()}`
