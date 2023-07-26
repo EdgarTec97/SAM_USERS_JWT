@@ -59,7 +59,7 @@ Resources:
       # Set the visibility timeout (in seconds) for messages in the queue
       VisibilityTimeout: 300
       # Set the maximum message size (in bytes) for the queue
-      MaximumMessageSize: 2048
+      # MaximumMessageSize: 2048
       # Set the message retention period (in seconds) for the queue
       MessageRetentionPeriod: 86400
       # Set the dead-letter queue configuration for the queue
@@ -81,21 +81,24 @@ Resources:
       # Set the message retention period (in seconds) for the dead-letter queue
       MessageRetentionPeriod: 1209600
   # Define an SQS Access Policy
-  # SampleSQSPolicy:
-  #   Type: AWS::SQS::QueuePolicy
-  #   Properties:
-  #     Queues:
-  #       - !Ref UserQueue # Use !Ref to get URL Queue
-  #     PolicyDocument:
-  #       Version: '2012-10-17'
-  #       Id: __default_policy_ID
-  #       Statement:
-  #         - Sid: __owner_statement
-  #           Effect: Allow
-  #           Principal:
-  #             AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
-  #           Action: SQS:*
-  #           Resource: !GetAtt UserQueue.Arn
+  SampleSQSPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref UserQueue # Use !Ref to get URL Queue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Id: !Sub 'topic-subscription-${UserQueue}'
+        Statement:
+          - Sid: !Sub 'topic-subscription-${TopicUserService}'
+            Effect: Allow
+            Principal:
+              AWS: '*' #!Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: SQS:*
+            Resource: !GetAtt UserQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref TopicUserService
   # Subscribe the SQS queue to the SNS topic
   MySQSToSNSSubscription:
     Type: 'AWS::SNS::Subscription'
