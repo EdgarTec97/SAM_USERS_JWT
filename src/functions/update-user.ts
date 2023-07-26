@@ -37,7 +37,7 @@ const updateUser = async (
       password: body?.password,
       age: body?.age || userExists.getAge(),
       role: body?.role || userExists.getRole(),
-      createdAt: userExists.getCreatedAt()
+      createdAt: <string>(<unknown>Date.parse(userExists.getCreatedAt()))
     });
 
     await UserRepository.createOrUpdate(user, false, userExists.getPassword());
