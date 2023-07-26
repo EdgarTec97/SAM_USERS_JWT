@@ -72,7 +72,6 @@ Resources:
       Tags:
         - Key: Environment
           Value: Production
-
   # Define an SQS dead-letter queue for User Service messages
   UserDeadLetterQueue:
     Type: 'AWS::SQS::Queue'
@@ -81,7 +80,22 @@ Resources:
       QueueName: UserDeadLetterQueue
       # Set the message retention period (in seconds) for the dead-letter queue
       MessageRetentionPeriod: 1209600
-
+  # Define an SQS Access Policy
+  # SampleSQSPolicy:
+  #   Type: AWS::SQS::QueuePolicy
+  #   Properties:
+  #     Queues:
+  #       - !Ref UserQueue # Use !Ref to get URL Queue
+  #     PolicyDocument:
+  #       Version: '2012-10-17'
+  #       Id: __default_policy_ID
+  #       Statement:
+  #         - Sid: __owner_statement
+  #           Effect: Allow
+  #           Principal:
+  #             AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+  #           Action: SQS:*
+  #           Resource: !GetAtt UserQueue.Arn
   # Subscribe the SQS queue to the SNS topic
   MySQSToSNSSubscription:
     Type: 'AWS::SNS::Subscription'
