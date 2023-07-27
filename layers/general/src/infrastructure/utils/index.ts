@@ -37,7 +37,7 @@ export class GlobalFunctions {
         const value = obj[property];
         newObj[property] =
           typeof value == 'object'
-            ? structuredClone({}, obj[property] as object)
+            ? structuredClone({}, obj[property] as any)
             : value;
       }
     });

@@ -1,5 +1,4 @@
-import 'reflect-metadata';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from '/opt/infra/index';
 
 export class LoginDTO {
   @IsString()

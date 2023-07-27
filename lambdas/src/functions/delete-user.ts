@@ -1,15 +1,17 @@
-import { APIGatewayProxyResult, APIGatewayEvent, Handler } from 'aws-lambda';
-import { IDPathParameterMissing } from '@/domain/errors/IDPathParameterMissing';
 import {
+  APIGatewayProxyResult,
+  APIGatewayEvent,
+  Handler,
   formatErrorResponse,
-  formatJSONResponse
-} from '@/domain/response/formatJSONResponse';
-import { UserId } from '@/domain/entities/value-objects/user.id';
-import { DomainError } from '@/domain/errors/DomainError';
-import middify from '@/infrastructure/middlewares/middify';
-import HttpStatus from '@/domain/types/HttpStatus';
-import { UserRepository } from '@/infrastructure/database';
-import { ADMINISTRATORS } from '@/domain/types/user.role';
+  formatJSONResponse,
+  middify,
+  DomainError,
+  IDPathParameterMissing,
+  UserRepository,
+  UserId,
+  HttpStatus,
+  ADMINISTRATORS
+} from '/opt/infra/index';
 
 const deleteUser = async (
   event: APIGatewayEvent & { body: any }

@@ -1,15 +1,16 @@
-import { APIGatewayProxyResult, Handler } from 'aws-lambda';
 import {
+  APIGatewayProxyResult,
+  RequestDTO,
+  Handler,
   formatErrorResponse,
-  formatJSONResponse
-} from '@/domain/response/formatJSONResponse';
-import middify from '@/infrastructure/middlewares/middify';
-import { RequestDTO } from '@/infrastructure/middlewares/RequestDTO';
+  formatJSONResponse,
+  middify,
+  DomainError,
+  DTOPropertiesError,
+  UserRepository,
+  HttpStatus
+} from '/opt/infra/index';
 import { LoginDTO } from '@/functions/dtos/login.dto';
-import HttpStatus from '@/domain/types/HttpStatus';
-import { DomainError } from '@/domain/errors/DomainError';
-import { UserRepository } from '@/infrastructure/database';
-import { DTOPropertiesError } from '@/domain/errors/DTOPropertiesError';
 
 const loginUser = async (
   event: RequestDTO<LoginDTO>

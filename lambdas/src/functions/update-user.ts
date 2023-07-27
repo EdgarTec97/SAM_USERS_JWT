@@ -1,18 +1,19 @@
-import { APIGatewayProxyResult, Handler } from 'aws-lambda';
-import { User } from '@/domain/entities/User';
-import { IDPathParameterMissing } from '@/domain/errors/IDPathParameterMissing';
 import {
+  APIGatewayProxyResult,
+  RequestDTO,
+  Handler,
   formatErrorResponse,
-  formatJSONResponse
-} from '@/domain/response/formatJSONResponse';
-import { UserId } from '@/domain/entities/value-objects/user.id';
-import middify from '@/infrastructure/middlewares/middify';
-import { RequestDTO } from '@/infrastructure/middlewares/RequestDTO';
+  formatJSONResponse,
+  middify,
+  DomainError,
+  IDPathParameterMissing,
+  UserRepository,
+  User,
+  HttpStatus,
+  UserId,
+  BASIC
+} from '/opt/infra/index';
 import { UpdateUserDTO } from '@/functions/dtos/update-user.dto';
-import HttpStatus from '@/domain/types/HttpStatus';
-import { DomainError } from '@/domain/errors/DomainError';
-import { UserRepository } from '@/infrastructure/database';
-import { BASIC } from '@/domain/types/user.role';
 
 const updateUser = async (
   event: RequestDTO<UpdateUserDTO>
