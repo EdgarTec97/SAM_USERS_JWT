@@ -30,11 +30,11 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: FN Eslint
-        run: cd lambdas && yarn lint
+        run: cd lambdas/general && yarn && yarn lint
       - name: Layers Eslint
-        run: cd layers && yarn lint
+        run: cd layers && yarn && yarn lint
       - name: FN Compilation
-        run: cd lambdas && yarn compile
+        run: cd lambdas/general && yarn compile
       - name: Layers Compilation
         run: cd layers && yarn build
       - name: Building
