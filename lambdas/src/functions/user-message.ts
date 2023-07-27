@@ -1,5 +1,4 @@
-import { SQSEvent, Handler } from 'aws-lambda';
-import { DomainError } from '@/domain/errors/DomainError';
+import { SQSEvent, Handler, DomainError } from '/opt/infra/index';
 
 const notification = async (event: SQSEvent): Promise<void> => {
   try {

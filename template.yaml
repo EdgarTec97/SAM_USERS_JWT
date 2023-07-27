@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   users-microservice
@@ -38,7 +38,7 @@ Parameters:
 Resources:
   # Define an SNS topic for User Service notifications
   TopicUserService:
-    Type: 'AWS::SNS::Topic'
+    Type: "AWS::SNS::Topic"
     Properties:
       # Set the display name for the SNS topic
       DisplayName: TopicUserService
@@ -52,7 +52,7 @@ Resources:
           Value: Production
   # Define an SQS queue for User Service messages
   UserQueue:
-    Type: 'AWS::SQS::Queue'
+    Type: "AWS::SQS::Queue"
     Properties:
       # Set the name of the SQS queue
       QueueName: UserQueue
@@ -74,7 +74,7 @@ Resources:
           Value: Production
   # Define an SQS dead-letter queue for User Service messages
   UserDeadLetterQueue:
-    Type: 'AWS::SQS::Queue'
+    Type: "AWS::SQS::Queue"
     Properties:
       # Set the name of the dead-letter queue
       QueueName: UserDeadLetterQueue
@@ -87,13 +87,13 @@ Resources:
       Queues:
         - !Ref UserQueue # Use !Ref to get URL Queue
       PolicyDocument:
-        Version: '2012-10-17'
-        Id: !Sub 'topic-subscription-${UserQueue}'
+        Version: "2012-10-17"
+        Id: !Sub "topic-subscription-${UserQueue}"
         Statement:
-          - Sid: !Sub 'topic-subscription-${TopicUserService}'
+          - Sid: !Sub "topic-subscription-${TopicUserService}"
             Effect: Allow
             Principal:
-              AWS: '*' #!Sub 'arn:aws:iam::${AWS::AccountId}:root'
+              AWS: "*" #!Sub 'arn:aws:iam::${AWS::AccountId}:root'
             Action: SQS:*
             Resource: !GetAtt UserQueue.Arn
             Condition:
@@ -101,10 +101,10 @@ Resources:
                 aws:SourceArn: !Ref TopicUserService
   # Subscribe the SQS queue to the SNS topic
   MySQSToSNSSubscription:
-    Type: 'AWS::SNS::Subscription'
+    Type: "AWS::SNS::Subscription"
     Properties:
       # Set the protocol to 'sqs' for the SQS endpoint
-      Protocol: 'sqs'
+      Protocol: "sqs"
       # Reference the ARN of the SNS topic to subscribe to
       TopicArn: !Ref TopicUserService
       # Reference the ARN of the SQS queue as the endpoint for the subscription
@@ -148,10 +148,21 @@ Resources:
             # Specifies which attributes should be projected to the index
             ProjectionType: ALL
 
+  SharedLayerLambda:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: SharedLayerLambda
+      ContentUri: layers/general/dist
+      CompatibleRuntimes:
+        - nodejs18.x
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: nodejs18.x
+
   CreateUser:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: src/functions/
+      CodeUri: lambdas/src/functions/
       Handler: create-user.handler
       Runtime: nodejs18.x
       Policies:
@@ -159,6 +170,8 @@ Resources:
             TableName: !Ref TableName
       Architectures:
         - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -177,7 +190,7 @@ Resources:
   GetUserById:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: src/functions/
+      CodeUri: lambdas/src/functions/
       Handler: get-user-by-id.handler
       Runtime: nodejs18.x
       Policies:
@@ -185,6 +198,8 @@ Resources:
             TableName: !Ref TableName
       Architectures:
         - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -203,7 +218,7 @@ Resources:
   GetUsers:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: src/functions/
+      CodeUri: lambdas/src/functions/
       Handler: get-users.handler
       Runtime: nodejs18.x
       Policies:
@@ -211,6 +226,8 @@ Resources:
             TableName: !Ref TableName
       Architectures:
         - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -229,7 +246,7 @@ Resources:
   DeleteUser:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: src/functions/
+      CodeUri: lambdas/src/functions/
       Handler: delete-user.handler
       Runtime: nodejs18.x
       Policies:
@@ -237,6 +254,8 @@ Resources:
             TableName: !Ref TableName
       Architectures:
         - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -255,7 +274,7 @@ Resources:
   UpdateUser:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: src/functions/
+      CodeUri: lambdas/src/functions/
       Handler: update-user.handler
       Runtime: nodejs18.x
       Policies:
@@ -263,6 +282,8 @@ Resources:
             TableName: !Ref TableName
       Architectures:
         - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -278,11 +299,10 @@ Resources:
         EntryPoints:
           - update-user.ts
 
-  
   LoginUser:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: src/functions/
+      CodeUri: lambdas/src/functions/
       Handler: login.handler
       Runtime: nodejs18.x
       Policies:
@@ -292,6 +312,8 @@ Resources:
             TopicName: !GetAtt TopicUserService.TopicName
       Architectures:
         - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
       Environment:
         Variables:
           TOPIC_ARN: !Ref TopicUserService
@@ -313,7 +335,7 @@ Resources:
   NotificationUser:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: src/functions/
+      CodeUri: lambdas/src/functions/
       Handler: user-message.handler
       Runtime: nodejs18.x
       Policies:
@@ -321,6 +343,8 @@ Resources:
             QueueName: !GetAtt UserQueue.QueueName
       Architectures:
         - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
       Events:
         UserQueue:
           Type: SQS
@@ -347,11 +371,11 @@ Resources:
     Properties:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
-      AutoConfigurationEnabled: 'true'
+      AutoConfigurationEnabled: "true"
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   CreateUser:
     Description: API Gateway endpoint URL for Prod stage for CreateUser function
-    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/create/'
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/create/"

@@ -1,16 +1,18 @@
-import { APIGatewayProxyResult, Handler } from 'aws-lambda';
-import { User, UserPrimitives } from '@/domain/entities/User';
 import {
+  APIGatewayProxyResult,
+  RequestDTO,
+  Handler,
   formatErrorResponse,
-  formatJSONResponse
-} from '@/domain/response/formatJSONResponse';
-import middify from '@/infrastructure/middlewares/middify';
-import { RequestDTO } from '@/infrastructure/middlewares/RequestDTO';
-import { GlobalFunctions } from '@/infrastructure/utils';
+  formatJSONResponse,
+  middify,
+  DomainError,
+  GlobalFunctions,
+  UserRepository,
+  User,
+  HttpStatus,
+  UserPrimitives
+} from '/opt/infra/index';
 import { CreateUserDTO } from '@/functions/dtos/create-user.dto';
-import HttpStatus from '@/domain/types/HttpStatus';
-import { DomainError } from '@/domain/errors/DomainError';
-import { UserRepository } from '@/infrastructure/database';
 
 const createUser = async (
   event: RequestDTO<CreateUserDTO>

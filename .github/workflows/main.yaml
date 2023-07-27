@@ -20,9 +20,15 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Eslint
-        run: yarn lint
-      - name: Compilation
-        run: yarn compile
+      - name: FN Eslint
+        run: cd functions && yarn lint
+      - name: Layers Eslint
+        run: cd layers && yarn lint
+      - name: FN Compilation
+        run: cd functions && yarn compile
+      - name: Layers Compilation
+        run: cd layers && yarn compile
+      - name: Building
+        run: yarn build
       # - name: Tests
       #   run: yarn test

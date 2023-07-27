@@ -1,6 +1,5 @@
-import 'reflect-metadata';
-import { IsString, IsNumber, IsOptional, MinLength } from 'class-validator';
-import { UserRole } from '@/domain/types/user.role';
+import { IsString, IsNumber, IsOptional, MinLength } from '/opt/infra/index';
+import { UserRole } from '/opt/infra/index';
 
 export class UpdateUserDTO {
   @IsString()
