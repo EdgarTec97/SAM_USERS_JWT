@@ -34,13 +34,13 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: FN Eslint
-        run: cd functions && yarn lint
+        run: cd lambdas && yarn lint
       - name: Layers Eslint
         run: cd layers && yarn lint
       - name: FN Compilation
-        run: cd functions && yarn compile
+        run: cd lambdas && yarn compile
       - name: Layers Compilation
-        run: cd layers && yarn compile
+        run: cd layers && yarn build
       - name: Building
         run: yarn build
       # - name: Tests
