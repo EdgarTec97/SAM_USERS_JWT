@@ -46,8 +46,6 @@ jobs:
         run: cd lambdas && yarn && yarn lint
       - name: Layers Eslint
         run: cd layers/general && yarn && yarn lint
-      - name: FN Compilation
-        run: cd lambdas && yarn compile
       - name: Layers Compilation
         run: cd layers/general && yarn build
       - name: Building
