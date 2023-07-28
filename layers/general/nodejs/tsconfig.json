@@ -3,17 +3,14 @@
     "target": "es2020",
     "strict": true,
     "preserveConstEnums": true,
-    "noEmit": true,
     "sourceMap": false,
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist/nodejs/node_modules/@general",
     "baseUrl": ".",
-    "types": ["reflect-metadata", "node", "webpack", "webpack-env", "jest"],
     "paths": {
       "@/*": ["./src/*"]
     }
