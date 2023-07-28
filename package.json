@@ -5,6 +5,7 @@
   "author": "Exception Corporation",
   "license": "ISC",
   "scripts": {
+    "layers": "cd layers/general/nodejs && yarn && yarn build && cd ../../../",
     "start": "yarn build && sam local start-api --docker-network sam-user-api -n .env.json",
     "start:prod": "yarn build && sam local start-api --template-file .aws-sam/build/template.yaml --docker-network sam-user-api -n .env.json",
     "build": "sam build --beta-features",

@@ -9,16 +9,7 @@ function modifyImports(filePath, aliasMap) {
     const line = lines[i];
 
     if (line.includes('@/')) {
-      const updatedLine = line.replace(/@\/(\w+)/g, (_, alias) => {
-        if (aliasMap[alias]) {
-          return aliasMap[alias];
-        } else {
-          throw new Error(
-            `Path alias not found for alias '@/${alias}' in tsconfig.json.`
-          );
-        }
-      });
-
+      const updatedLine = replacer(filePath);
       lines[i] = updatedLine;
     }
   }
@@ -26,6 +17,20 @@ function modifyImports(filePath, aliasMap) {
   const modifiedContent = lines.join('\n');
   fs.writeFileSync(filePath, modifiedContent);
 }
+
+const replacer = (filePath) => {
+  const marker = 'nodejs/src/';
+
+  const index = filePath.lastIndexOf(marker);
+  if (index !== -1) {
+    const relativePath = filePath.substring(index + marker.length);
+    const upLevels = '../'.repeat((relativePath.match(/\//g) || []).length);
+    const resultString = upLevels + relativePath;
+    return resultString;
+  } else {
+    throw new Error('Marker not found in the file path.');
+  }
+};
 
 function modifyImportsInDirectory(dirPath, aliasMap) {
   const files = fs.readdirSync(dirPath);
