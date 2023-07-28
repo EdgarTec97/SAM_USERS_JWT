@@ -9,7 +9,7 @@
     "lambdas": "cd lambdas && yarn && cd ..",
     "start": "yarn build && sam local start-api --docker-network sam-user-api -n .env.json",
     "start:prod": "yarn build && sam local start-api --template-file .aws-sam/build/template.yaml --docker-network sam-user-api -n .env.json",
-    "build": "sam build --beta-features && cp layers/general/dist/node_modules .aws-sam/build/SharedLayerLambda/nodejs/node_modules",
+    "build": "sam build --beta-features && cp -R layers/general/dist/node_modules .aws-sam/build/SharedLayerLambda/nodejs/node_modules",
     "deploy:production": "yarn build && sam deploy --template-file .aws-sam/build/template.yaml --stack-name user-service-production --s3-bucket user-bags-service-production --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides TableName=BgUsers DeployEnviroment=prod IsOffline=false DynamoHost=dynamodb.us-east-1.amazonaws.com AWSRegion=us-east-1 Expiration=2 SecretKey=shhh",
     "delete:production": "sam delete --stack-name user-service-production",
     "deploy:staging": "yarn build && sam deploy --template-file .aws-sam/build/template.yaml --stack-name user-service-staging --s3-bucket user-bags-service-staging --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset --parameter-overrides TableName=BgUsers DeployEnviroment=prod IsOffline=false DynamoHost=dynamodb.us-east-1.amazonaws.com AWSRegion=us-east-1 Expiration=2 SecretKey=shhh",
