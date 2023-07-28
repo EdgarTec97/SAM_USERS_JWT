@@ -9,7 +9,7 @@ function modifyImports(filePath, aliasMap) {
     const line = lines[i];
 
     if (line.includes('@/')) {
-      const updatedLine = replacer(filePath);
+      const updatedLine = line.includes('@/', replacer(filePath));
       lines[i] = updatedLine;
     }
   }
@@ -25,8 +25,7 @@ const replacer = (filePath) => {
   if (index !== -1) {
     const relativePath = filePath.substring(index + marker.length);
     const upLevels = '../'.repeat((relativePath.match(/\//g) || []).length);
-    const resultString = upLevels + relativePath;
-    return resultString;
+    return upLevels;
   } else {
     throw new Error('Marker not found in the file path.');
   }
