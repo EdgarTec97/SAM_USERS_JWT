@@ -1,3 +1,4 @@
+//@ts-ignore
 import { IsOptional, IsString } from '@general';
 
 export class LoginDTO {

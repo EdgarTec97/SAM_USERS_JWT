@@ -1,4 +1,5 @@
-import { IsString, IsNumber, IsOptional, MinLength,UserRole } from '@general';
+//@ts-ignore
+import { IsString, IsNumber, IsOptional, MinLength, UserRole } from '@general';
 
 export class CreateUserDTO {
   @IsString()

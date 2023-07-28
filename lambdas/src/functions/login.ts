@@ -1,4 +1,4 @@
-import {APIGatewayProxyResult,Handler} from "aws-lambda"
+import { APIGatewayProxyResult, Handler } from 'aws-lambda';
 import {
   RequestDTO,
   formatErrorResponse,

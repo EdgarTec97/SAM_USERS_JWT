@@ -1,5 +1,5 @@
-import {SQSEvent, Handler} from "aws-lambda"
-import {  DomainError } from '@general';
+import { SQSEvent, Handler } from 'aws-lambda';
+import { DomainError } from '@general';
 
 const notification = async (event: SQSEvent): Promise<void> => {
   try {

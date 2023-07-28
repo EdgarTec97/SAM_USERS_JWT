@@ -9,7 +9,7 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist/nodejs/node_modules/@general",
+    "outDir": "./dist/node_modules/@general",
     "baseUrl": "."
   },
   "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts"],

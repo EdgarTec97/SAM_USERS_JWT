@@ -1,4 +1,4 @@
-import {APIGatewayProxyResult,Handler,APIGatewayEvent} from "aws-lambda"
+import { APIGatewayProxyResult, Handler, APIGatewayEvent } from 'aws-lambda';
 import {
   formatErrorResponse,
   formatJSONResponse,
@@ -25,7 +25,7 @@ const getUsers = async (
     return formatJSONResponse(HttpStatus.OK, {
       success: true,
       ...data,
-      users: data.users.map((user:User) => user.toPrimitives())
+      users: data.users.map((user: User) => user.toPrimitives())
     });
   } catch (error: DomainError | any) {
     console.error(error);

@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, MinLength,UserRole } from '@general';
+import { IsString, IsNumber, IsOptional, MinLength, UserRole } from '@general';
 
 export class UpdateUserDTO {
   @IsString()

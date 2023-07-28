@@ -181,7 +181,9 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: true,
+        External:
+          - "@general"
         Target: es2020
         Sourcemap: false
         EntryPoints:
@@ -209,7 +211,9 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: true,
+        External:
+          - "@general"
         Target: es2020
         Sourcemap: false
         EntryPoints:
@@ -237,7 +241,9 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: true,
+        External:
+          - "@general"
         Target: es2020
         Sourcemap: false
         EntryPoints:
@@ -265,7 +271,9 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: true,
+        External:
+          - "@general"
         Target: es2020
         Sourcemap: false
         EntryPoints:
@@ -293,7 +301,9 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: true,
+        External:
+          - "@general"
         Target: es2020
         Sourcemap: false
         EntryPoints:
@@ -326,7 +336,9 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: true,
+        External:
+          - "@general"
         Target: es2020
         Sourcemap: false
         EntryPoints:
@@ -353,7 +365,9 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: true,
+        External:
+          - "@general"
         Target: es2020
         Sourcemap: false
         EntryPoints:
