@@ -9,7 +9,7 @@
     "clean": "rm -rf dist/",
     "format": "prettier 'src/**/*.ts' --write",
     "build": "yarn clean && mkdir dist/ && cd dist/ && mkdir nodejs/ && cd nodejs/ && npm init -y && mkdir node_modules/ && cd node_modules/ && mkdir @general/ && cd @general/ && cp ../../../../package.json ./package.json && yarn install --production && cd ../../../../ && yarn compile && cp ./package.json ./dist/nodejs/node_modules/@general/package.json",
-    "compile": "ts-node -r ./compile.js -P ./tsconfig.json -T",
+    "compile": "node compiler.js",
     "compile:watch": "tsc -w --preserveWatchOutput true",
     "lint": "eslint ./src --ext .ts",
     "test": "jest --runInBand",
@@ -30,8 +30,6 @@
     "esbuild": "0.14.14",
     "jsonwebtoken": "^9.0.0",
     "reflect-metadata": "0.1.13",
-    "tsc-alias": "^1.8.7",
-    "tsconfig-paths": "^4.2.0",
     "uuid": "8.3.2"
   },
   "devDependencies": {
