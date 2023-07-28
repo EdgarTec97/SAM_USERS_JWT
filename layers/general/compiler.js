@@ -18,7 +18,7 @@ function modifyImports(filePath, aliasMap) {
 }
 
 const replacer = (filePath) => {
-  const marker = 'nodejs/src/';
+  const marker = 'general/src/';
 
   const index = filePath.lastIndexOf(marker);
   if (index !== -1) {
@@ -64,7 +64,7 @@ const tsConfig = require(tsConfigPath);
 const aliasMap = tsConfig.compilerOptions.paths;
 
 const srcPath = path.join(__dirname, 'src');
-const distPath = path.join(__dirname, 'dist');
+const distPath = path.join(__dirname, 'build');
 
 createDirRecursive(distPath);
 copyFilesRecursively(srcPath, distPath, aliasMap);

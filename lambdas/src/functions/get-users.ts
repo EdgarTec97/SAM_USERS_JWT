@@ -1,7 +1,5 @@
+import {APIGatewayProxyResult,Handler,APIGatewayEvent} from "aws-lambda"
 import {
-  APIGatewayProxyResult,
-  APIGatewayEvent,
-  Handler,
   formatErrorResponse,
   formatJSONResponse,
   middify,
@@ -10,7 +8,7 @@ import {
   User,
   HttpStatus,
   ADMINISTRATORS
-} from '/opt/infra/index';
+} from '@general';
 
 const getUsers = async (
   event: APIGatewayEvent & { body: any }

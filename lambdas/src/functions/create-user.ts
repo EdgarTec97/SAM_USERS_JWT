@@ -1,7 +1,6 @@
+import {APIGatewayProxyResult,Handler} from "aws-lambda"
 import {
-  APIGatewayProxyResult,
   RequestDTO,
-  Handler,
   formatErrorResponse,
   formatJSONResponse,
   middify,
@@ -11,7 +10,7 @@ import {
   User,
   HttpStatus,
   UserPrimitives
-} from '/opt/infra/index';
+} from '@general';
 import { CreateUserDTO } from '@/functions/dtos/create-user.dto';
 
 const createUser = async (

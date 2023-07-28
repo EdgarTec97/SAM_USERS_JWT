@@ -6,10 +6,10 @@
   "license": "ISC",
   "main": "index.js",
   "scripts": {
-    "clean": "rm -rf dist/",
+    "clean": "rm -rf dist/ && rm -rf build/",
     "format": "prettier 'src/**/*.ts' --write",
     "build": "yarn clean && mkdir dist/ && cd dist/ && mkdir nodejs/ && cd nodejs/ && npm init -y && mkdir node_modules/ && cd node_modules/ && mkdir @general/ && cd @general/ && cp ../../../../package.json ./package.json && yarn install --production && cd ../../../../ && yarn compile && cp ./package.json ./dist/nodejs/node_modules/@general/package.json",
-    "compile": "node compiler.js",
+    "compile": "node compiler.js && tsc --project tsconfig.production.json",
     "compile:watch": "tsc -w --preserveWatchOutput true",
     "lint": "eslint ./src --ext .ts",
     "test": "jest --runInBand",

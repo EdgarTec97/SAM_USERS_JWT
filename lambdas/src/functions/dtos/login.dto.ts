@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from '/opt/infra/index';
+import { IsOptional, IsString } from '@general';
 
 export class LoginDTO {
   @IsString()

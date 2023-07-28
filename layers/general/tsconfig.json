@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2020",
     "strict": true,
+    "noEmit": true,
     "preserveConstEnums": true,
     "sourceMap": false,
     "module": "commonjs",
@@ -9,7 +10,6 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist/nodejs/node_modules/@general",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
