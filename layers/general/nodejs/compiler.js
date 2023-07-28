@@ -14,8 +14,7 @@ function modifyImports(filePath, aliasMap) {
     }
   }
 
-  const modifiedContent = lines.join('\n');
-  fs.writeFileSync(filePath, modifiedContent);
+  return lines.join('\n');
 }
 
 const replacer = (filePath) => {
@@ -31,16 +30,31 @@ const replacer = (filePath) => {
   }
 };
 
-function modifyImportsInDirectory(dirPath, aliasMap) {
-  const files = fs.readdirSync(dirPath);
+function createDirRecursive(targetPath) {
+  const parentDir = path.dirname(targetPath);
+  if (!fs.existsSync(parentDir)) {
+    createDirRecursive(parentDir);
+  }
+  if (!fs.existsSync(targetPath)) {
+    fs.mkdirSync(targetPath);
+  }
+}
+
+function copyFilesRecursively(srcDir, distDir, aliasMap) {
+  const files = fs.readdirSync(srcDir);
 
   for (const file of files) {
-    const filePath = path.join(dirPath, file);
+    const srcFilePath = path.join(srcDir, file);
+    const distFilePath = path.join(distDir, file);
 
-    if (fs.statSync(filePath).isDirectory()) {
-      modifyImportsInDirectory(filePath, aliasMap);
-    } else if (filePath.endsWith('.ts')) {
-      modifyImports(filePath, aliasMap);
+    if (fs.statSync(srcFilePath).isDirectory()) {
+      createDirRecursive(distFilePath);
+      copyFilesRecursively(srcFilePath, distFilePath, aliasMap);
+    } else if (srcFilePath.endsWith('.ts')) {
+      const modifiedContent = modifyImports(srcFilePath, aliasMap);
+      fs.writeFileSync(distFilePath, modifiedContent);
+    } else {
+      fs.copyFileSync(srcFilePath, distFilePath);
     }
   }
 }
@@ -50,6 +64,9 @@ const tsConfig = require(tsConfigPath);
 const aliasMap = tsConfig.compilerOptions.paths;
 
 const srcPath = path.join(__dirname, 'src');
-modifyImportsInDirectory(srcPath, aliasMap);
+const distPath = path.join(__dirname, 'dist');
 
-console.log('All imports modified successfully!');
+createDirRecursive(distPath);
+copyFilesRecursively(srcPath, distPath, aliasMap);
+
+console.log('All imports modified and files copied successfully!');
