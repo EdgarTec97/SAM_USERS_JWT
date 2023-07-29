@@ -18,7 +18,7 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v3
       - uses: aws-actions/setup-sam@v2
       - uses: aws-actions/configure-aws-credentials@v1
         with:
