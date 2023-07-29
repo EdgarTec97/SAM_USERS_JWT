@@ -181,7 +181,7 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true,
+        Minify: true
         External:
           - "@general"
         Target: es2020
@@ -211,7 +211,7 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true,
+        Minify: true
         External:
           - "@general"
         Target: es2020
@@ -241,7 +241,7 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true,
+        Minify: true
         External:
           - "@general"
         Target: es2020
@@ -271,7 +271,7 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true,
+        Minify: true
         External:
           - "@general"
         Target: es2020
@@ -301,7 +301,7 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true,
+        Minify: true
         External:
           - "@general"
         Target: es2020
@@ -336,7 +336,7 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true,
+        Minify: true
         External:
           - "@general"
         Target: es2020
@@ -365,7 +365,7 @@ Resources:
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true,
+        Minify: true
         External:
           - "@general"
         Target: es2020
