@@ -1,5 +1,4 @@
-import { IsString, IsNumber, IsOptional, MinLength } from '/opt/infra/index';
-import { UserRole } from '/opt/infra/index';
+import { IsString, IsNumber, IsOptional, MinLength, UserRole } from '@general';
 
 export class UpdateUserDTO {
   @IsString()

@@ -1,5 +1,4 @@
 import { aws } from 'dynamoose';
-import AWS from 'aws-sdk';
 import {
   SNSClient,
   PublishCommand,
@@ -28,11 +27,16 @@ export class DynamoUserRepository implements UserRepository {
   private snsClient: SNSClient;
 
   constructor() {
-    AWS.config.update({ region: this.region });
-
     const SnSConfig: SNSClientConfig = {
       region: this.region
     };
+
+    const ddb = new aws.ddb.DynamoDB({
+      region: this.region
+    });
+
+    // Set DynamoDB instance to the Dynamoose DDB instance
+    aws.ddb.set(ddb);
 
     if (config.isOffline) {
       const endpoint = `http://${config.aws.dynamoDB.users.host}:${config.aws.dynamoDB.users.port}`;

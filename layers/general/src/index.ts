@@ -1,10 +1,3 @@
-export {
-  APIGatewayProxyResult,
-  APIGatewayEvent,
-  Handler,
-  SQSEvent
-} from 'aws-lambda';
-
 export { IsOptional, IsString, IsNumber, MinLength } from 'class-validator';
 
 import HttpStatus from '@/domain/types/HttpStatus';

@@ -1,7 +1,6 @@
+import { APIGatewayProxyResult, Handler } from 'aws-lambda';
 import {
-  APIGatewayProxyResult,
   RequestDTO,
-  Handler,
   formatErrorResponse,
   formatJSONResponse,
   middify,
@@ -12,7 +11,7 @@ import {
   HttpStatus,
   UserId,
   BASIC
-} from '/opt/infra/index';
+} from '@general';
 import { UpdateUserDTO } from '@/functions/dtos/update-user.dto';
 
 const updateUser = async (

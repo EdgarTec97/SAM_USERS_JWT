@@ -1,7 +1,6 @@
+import { APIGatewayProxyResult, Handler } from 'aws-lambda';
 import {
-  APIGatewayProxyResult,
   RequestDTO,
-  Handler,
   formatErrorResponse,
   formatJSONResponse,
   middify,
@@ -9,7 +8,7 @@ import {
   DTOPropertiesError,
   UserRepository,
   HttpStatus
-} from '/opt/infra/index';
+} from '@general';
 import { LoginDTO } from '@/functions/dtos/login.dto';
 
 const loginUser = async (

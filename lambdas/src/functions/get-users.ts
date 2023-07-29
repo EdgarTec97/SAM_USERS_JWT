@@ -1,7 +1,5 @@
+import { APIGatewayProxyResult, Handler, APIGatewayEvent } from 'aws-lambda';
 import {
-  APIGatewayProxyResult,
-  APIGatewayEvent,
-  Handler,
   formatErrorResponse,
   formatJSONResponse,
   middify,
@@ -10,7 +8,7 @@ import {
   User,
   HttpStatus,
   ADMINISTRATORS
-} from '/opt/infra/index';
+} from '@general';
 
 const getUsers = async (
   event: APIGatewayEvent & { body: any }
@@ -27,7 +25,7 @@ const getUsers = async (
     return formatJSONResponse(HttpStatus.OK, {
       success: true,
       ...data,
-      users: data.users.map((user:User) => user.toPrimitives())
+      users: data.users.map((user: User) => user.toPrimitives())
     });
   } catch (error: DomainError | any) {
     console.error(error);

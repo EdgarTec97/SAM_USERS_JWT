@@ -1,0 +1,29 @@
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 2048
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref TableName
+        DEPLOY_ENVIRONMENT: !Ref DeployEnviroment
+        #AWS_REGION: !Ref AWSRegion
+        IS_OFFLINE: !Ref IsOffline #change this to false for deploy in aws or true for use in offline
+        DYNAMOHOST: !Ref DynamoHost
+        DYNAMO_PORT: 4566
+        SECRET_KEY: !Ref SecretKey
+        EXPIRATION: !Ref Expiration
+
+Parameters:
+  TableName:
+    Type: String
+  DeployEnviroment:
+    Type: String
+  IsOffline:
+    Type: String
+  DynamoHost:
+    Type: String
+  SecretKey:
+    Type: String
+  Expiration:
+    Type: String

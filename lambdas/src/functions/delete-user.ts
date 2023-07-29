@@ -1,7 +1,5 @@
+import { APIGatewayProxyResult, Handler, APIGatewayEvent } from 'aws-lambda';
 import {
-  APIGatewayProxyResult,
-  APIGatewayEvent,
-  Handler,
   formatErrorResponse,
   formatJSONResponse,
   middify,
@@ -11,7 +9,7 @@ import {
   UserId,
   HttpStatus,
   ADMINISTRATORS
-} from '/opt/infra/index';
+} from '@general';
 
 const deleteUser = async (
   event: APIGatewayEvent & { body: any }
