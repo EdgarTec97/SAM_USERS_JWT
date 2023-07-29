@@ -26,13 +26,13 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - uses: actions/cache@v2.1.6
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-      - uses: actions/setup-python@v2
-      - uses: aws-actions/setup-sam@v1
+      - uses: actions/setup-python@v4
+      - uses: aws-actions/setup-sam@v2
       - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
