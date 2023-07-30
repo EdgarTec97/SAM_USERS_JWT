@@ -34,7 +34,7 @@ export class SESEmailService implements IEmailService<Boolean> {
           },
           Subject: { Data: data.subject }
         },
-        Source: data.origin
+        Source: config.aws.adminEmail
       };
 
       return (await this.sesClient.send(new SendEmailCommand(params))) && true;

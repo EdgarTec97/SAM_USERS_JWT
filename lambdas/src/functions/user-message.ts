@@ -13,8 +13,7 @@ const notification = async (event: SQSEvent): Promise<void> => {
       await SESEmailService.send({
         destination: user.email,
         message: 'Should validate your email',
-        subject: 'User-Service Email-Validation',
-        origin: 'no-reply@user-service.com'
+        subject: 'User-Service Email-Validation'
       });
     }
   } catch (error: DomainError | any) {

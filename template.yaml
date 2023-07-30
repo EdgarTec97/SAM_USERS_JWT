@@ -20,6 +20,7 @@ Globals:
         DYNAMO_PORT: 4566
         SECRET_KEY: !Ref SecretKey
         EXPIRATION: !Ref Expiration
+        ADMIN_EMAIL: !Ref AdminEmail
 
 Parameters:
   TableName:
@@ -33,6 +34,8 @@ Parameters:
   SecretKey:
     Type: String
   Expiration:
+    Type: String
+  AdminEmail:
     Type: String
 
 Resources:
@@ -163,6 +166,10 @@ Resources:
         BlockPublicPolicy: false
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
+  MySESVerifiedEmail:
+    Type: "AWS::SES::EmailIdentity"
+    Properties:
+      EmailIdentity: !Ref AdminEmail
 
   SharedLayerLambda:
     Type: AWS::Serverless::LayerVersion
@@ -219,10 +226,7 @@ Resources:
       Policies:
         - SQSPollerPolicy:
             QueueName: !GetAtt UserQueue.QueueName
-        - Statement:
-            - Effect: Allow
-              Action: "ses:SendEmail"
-              Resource: "*"
+        - AmazonSESFullAccess
       Architectures:
         - x86_64
       Layers:
