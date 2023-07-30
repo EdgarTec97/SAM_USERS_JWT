@@ -4,8 +4,8 @@ import { DomainError } from '@general';
 const notification = async (event: SQSEvent): Promise<void> => {
   try {
     for (const record of event.Records) {
-      const messageBody = record.body;
-      console.info(`Received message from SQS: ${messageBody}`);
+      const { body } = record;
+      console.info(`Received message from SQS: ${body}`);
     }
   } catch (error: DomainError | any) {
     console.error(error);

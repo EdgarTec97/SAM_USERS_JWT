@@ -37,6 +37,8 @@ const updateUser = async (
       password: body?.password,
       age: body?.age || userExists.getAge(),
       role: body?.role || userExists.getRole(),
+      verified: userExists.getVerified(),
+      avatar: body?.avatar || userExists.getAvatar(),
       createdAt: <string>(<unknown>Date.parse(userExists.getCreatedAt()))
     });
 

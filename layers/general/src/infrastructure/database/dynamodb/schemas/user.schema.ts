@@ -48,6 +48,14 @@ export const UserSchema = new Schema(
       type: String,
       enum: ['root', 'standard', 'visitor']
     },
+    verified: {
+      type: Boolean,
+      default: false
+    },
+    avatar: {
+      type: String,
+      default: ''
+    },
     active: {
       type: Boolean,
       default: true

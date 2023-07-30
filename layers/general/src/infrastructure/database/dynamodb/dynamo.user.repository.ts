@@ -1,10 +1,4 @@
 import { aws } from 'dynamoose';
-import {
-  SNSClient,
-  PublishCommand,
-  SNSClientConfig,
-  PublishCommandInput
-} from '@aws-sdk/client-sns';
 import { User, UserPrimitives } from '@/domain/entities/User';
 import { UserRepository } from '@/domain/repositories/user.repository';
 import { UserNotFound } from '@/domain/errors/UserNotFound';
@@ -24,13 +18,8 @@ export class DynamoUserRepository implements UserRepository {
   private readonly model = UserModel;
 
   private readonly region = config.aws.region;
-  private snsClient: SNSClient;
 
   constructor() {
-    const SnSConfig: SNSClientConfig = {
-      region: this.region
-    };
-
     const ddb = new aws.ddb.DynamoDB({
       region: this.region
     });
@@ -41,10 +30,7 @@ export class DynamoUserRepository implements UserRepository {
     if (config.isOffline) {
       const endpoint = `http://${config.aws.dynamoDB.users.host}:${config.aws.dynamoDB.users.port}`;
       aws.ddb.local(endpoint);
-      SnSConfig.endpoint = endpoint;
     }
-
-    this.snsClient = new SNSClient(SnSConfig);
   }
 
   async getUsers(page: number, pageSize: number): Promise<UsersResponse> {
@@ -123,9 +109,13 @@ export class DynamoUserRepository implements UserRepository {
     if (save) {
       if (usersFound.pop()) throw new UserExistsError();
 
-      const document = new this.model(
-        GlobalFunctions.getNewParams(userPrimitives, ['createdAt', 'updatedAt'])
-      );
+      const document = new this.model({
+        ...GlobalFunctions.getNewParams(userPrimitives, [
+          'createdAt',
+          'updatedAt'
+        ]),
+        active: true
+      });
       await document.save();
       return;
     }
@@ -199,20 +189,6 @@ export class DynamoUserRepository implements UserRepository {
 
     if (!verifyPassword)
       throw new UserNotFound('', 'User not found: Incorrect credentials');
-
-    const params: PublishCommandInput = {
-      TopicArn: config.aws.userTopic,
-      Message: JSON.stringify({ user: userFound })
-    };
-
-    try {
-      await this.snsClient.send(new PublishCommand(params));
-      console.info('Message sent to SNS topic.');
-    } catch (error: any) {
-      console.error(
-        `Error publishing message to SNS topic: ${error.toString()}`
-      );
-    }
 
     return JSONWebTokenAuth.getInstance().sign(userFound, [
       'createdAt',

@@ -50,6 +50,9 @@ Resources:
       Tags:
         - Key: Environment
           Value: Production
+      # Subscription:
+      #   - Protocol: email
+      #     Endpoint: !Ref emailValidator
   # Define an SQS queue for User Service messages
   UserQueue:
     Type: "AWS::SQS::Queue"
@@ -67,7 +70,7 @@ Resources:
         # Set the Amazon Resource Name (ARN) of the dead-letter queue
         deadLetterTargetArn: !GetAtt UserDeadLetterQueue.Arn
         # Set the maximum number of receives before moving messages to the dead-letter queue
-        maxReceiveCount: 5
+        maxReceiveCount: 1
       # Add tags to the SQS queue (e.g., for identifying the environment)
       Tags:
         - Key: Environment
@@ -147,6 +150,19 @@ Resources:
           Projection:
             # Specifies which attributes should be projected to the index
             ProjectionType: ALL
+  AvatarS3Bucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: avatars-bucket-ecv
+      AccessControl: Private
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
 
   SharedLayerLambda:
     Type: AWS::Serverless::LayerVersion
@@ -168,10 +184,15 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref TableName
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt TopicUserService.TopicName
       Architectures:
         - x86_64
       Layers:
         - !Ref SharedLayerLambda # Reference to the Lambda Layer
+      Environment:
+        Variables:
+          TOPIC_ARN: !Ref TopicUserService
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -188,6 +209,67 @@ Resources:
         Sourcemap: false
         EntryPoints:
           - create-user.ts
+
+  NotificationUser:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: lambdas/src/functions/
+      Handler: user-message.handler
+      Runtime: nodejs18.x
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt UserQueue.QueueName
+      Architectures:
+        - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
+      Events:
+        UserQueue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt UserQueue.Arn
+            BatchSize: 10
+      # EventInvokeConfig:
+      #   DestinationConfig:
+      #     OnSuccess:
+      #       Type: Lambda
+      #       Destination: !GetAtt EmailValidator.Arn
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        External:
+          - "@general"
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - user-message.ts
+
+  EmailValidator:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: lambdas/src/functions/
+      Handler: email-validator.handler
+      Runtime: nodejs18.x
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: "ses:SendEmail"
+              Resource: "*"
+      Architectures:
+        - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        External:
+          - "@general"
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - email-validator.ts
 
   GetUserById:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -318,15 +400,10 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref TableName
-        - SNSPublishMessagePolicy:
-            TopicName: !GetAtt TopicUserService.TopicName
       Architectures:
         - x86_64
       Layers:
         - !Ref SharedLayerLambda # Reference to the Lambda Layer
-      Environment:
-        Variables:
-          TOPIC_ARN: !Ref TopicUserService
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -343,35 +420,6 @@ Resources:
         Sourcemap: false
         EntryPoints:
           - login.ts
-
-  NotificationUser:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: lambdas/src/functions/
-      Handler: user-message.handler
-      Runtime: nodejs18.x
-      Policies:
-        - SQSPollerPolicy:
-            QueueName: !GetAtt UserQueue.QueueName
-      Architectures:
-        - x86_64
-      Layers:
-        - !Ref SharedLayerLambda # Reference to the Lambda Layer
-      Events:
-        UserQueue:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt UserQueue.Arn
-    Metadata: # Manage esbuild properties
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        External:
-          - "@general"
-        Target: es2020
-        Sourcemap: false
-        EntryPoints:
-          - user-message.ts
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group

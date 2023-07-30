@@ -15,6 +15,8 @@ export class User {
     private password: string,
     private age: number,
     private role: UserRole,
+    private verified: boolean,
+    private avatar: string,
     private createdAt: string,
     private updatedAt: string
   ) {
@@ -38,6 +40,8 @@ export class User {
       u.password,
       u.age,
       u.role as UserRole,
+      u.verified,
+      u.avatar,
       u.createdAt || date,
       u.updatedAt || date
     );
@@ -61,6 +65,17 @@ export class User {
         "The email isn't in the correct format."
       );
 
+    if (
+      this.avatar &&
+      /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi.test(
+        this.avatar
+      )
+    )
+      throw new InvalidPropertyError(
+        this.avatar,
+        'The avatar should have correct url format (location)'
+      );
+
     if (this.age < 18)
       throw new InvalidPropertyError(
         this.age,
@@ -79,6 +94,8 @@ export class User {
       password: this.password,
       age: this.age,
       role: this.role,
+      avatar: this.avatar,
+      verified: this.verified,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     };
@@ -90,6 +107,10 @@ export class User {
 
   getFirstName(): string {
     return this.firstName;
+  }
+
+  getAvatar(): string {
+    return this.avatar;
   }
 
   getLastName(): string {
@@ -114,6 +135,10 @@ export class User {
 
   getRole(): UserRole {
     return this.role;
+  }
+
+  getVerified(): boolean {
+    return this.verified;
   }
 
   getCreatedAt(): string {
