@@ -219,6 +219,10 @@ Resources:
       Policies:
         - SQSPollerPolicy:
             QueueName: !GetAtt UserQueue.QueueName
+        - Statement:
+            - Effect: Allow
+              Action: "ses:SendEmail"
+              Resource: "*"
       Architectures:
         - x86_64
       Layers:
@@ -245,21 +249,28 @@ Resources:
         EntryPoints:
           - user-message.ts
 
-  EmailValidator:
+  MetaDataValidator:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: lambdas/src/functions/
-      Handler: email-validator.handler
+      Handler: meta-data-validator.handler
       Runtime: nodejs18.x
-      Policies:
-        - Statement:
-            - Effect: Allow
-              Action: "ses:SendEmail"
-              Resource: "*"
       Architectures:
         - x86_64
+      # Policies:
+      #   - S3ReadPolicy:
+      #       BucketName: !Ref AvatarS3Bucket
+      # Environment:
+      #   Variables:
+      #     BUCKET_NAME: !Ref AvatarS3Bucket
       Layers:
         - !Ref SharedLayerLambda # Reference to the Lambda Layer
+      Events:
+        MyS3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref AvatarS3Bucket
+            Events: s3:ObjectCreated:*
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -269,7 +280,7 @@ Resources:
         Target: es2020
         Sourcemap: false
         EntryPoints:
-          - email-validator.ts
+          - meta-data-validator.ts
 
   GetUserById:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
