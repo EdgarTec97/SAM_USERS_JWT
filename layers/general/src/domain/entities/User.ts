@@ -65,12 +65,7 @@ export class User {
         "The email isn't in the correct format."
       );
 
-    if (
-      this.avatar &&
-      /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi.test(
-        this.avatar
-      )
-    )
+    if (this.isValidHttpUrl(this.avatar))
       throw new InvalidPropertyError(
         this.avatar,
         'The avatar should have correct url format (location)'
@@ -151,5 +146,17 @@ export class User {
 
   getPhone(): string | undefined {
     return this.phone;
+  }
+
+  private isValidHttpUrl(uri: string) {
+    let url;
+
+    try {
+      url = new URL(uri);
+    } catch (_) {
+      return false;
+    }
+
+    return url.protocol === 'http:' || url.protocol === 'https:';
   }
 }
