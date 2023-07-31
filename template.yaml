@@ -86,6 +86,22 @@ Resources:
       QueueName: UserDeadLetterQueue
       # Set the message retention period (in seconds) for the dead-letter queue
       MessageRetentionPeriod: 1209600
+  # Define an SQS [Success] queue for Meta data lambda destination
+  MetaDataOnSuccessQueue:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      # Set the name of the queue
+      QueueName: MetaDataOnSuccessQueue
+      # Set the message retention period (in seconds) for the dead-letter queue
+      MessageRetentionPeriod: 1209600
+  # Define an SQS [Fail] queue for Meta data lambda destination
+  MetaDataOnFailQueue:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      # Set the name of the queue
+      QueueName: MetaDataOnFailQueue
+      # Set the message retention period (in seconds) for the dead-letter queue
+      MessageRetentionPeriod: 1209600
   # Define an SQS Access Policy
   SampleSQSPolicy:
     Type: AWS::SQS::QueuePolicy
@@ -237,11 +253,6 @@ Resources:
           Properties:
             Queue: !GetAtt UserQueue.Arn
             BatchSize: 10
-      # EventInvokeConfig:
-      #   DestinationConfig:
-      #     OnSuccess:
-      #       Type: Lambda
-      #       Destination: !GetAtt EmailValidator.Arn
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -261,7 +272,11 @@ Resources:
       Runtime: nodejs18.x
       Architectures:
         - x86_64
-      # Policies:
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt MetaDataOnSuccessQueue.QueueName
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt MetaDataOnFailQueue.QueueName
       #   - S3ReadPolicy:
       #       BucketName: !Ref AvatarS3Bucket
       # Environment:
@@ -269,6 +284,14 @@ Resources:
       #     BUCKET_NAME: !Ref AvatarS3Bucket
       Layers:
         - !Ref SharedLayerLambda # Reference to the Lambda Layer
+      EventInvokeConfig:
+        DestinationConfig:
+          OnSuccess:
+            Type: SQS
+            Destination: !GetAtt MetaDataOnSuccessQueue.Arn
+          OnFailure:
+            Type: SQS
+            Destination: !GetAtt MetaDataOnFailQueue.Arn
       Events:
         MyS3Event:
           Type: S3
