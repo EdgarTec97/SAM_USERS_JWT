@@ -182,6 +182,19 @@ Resources:
         BlockPublicPolicy: false
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
+  WaterMarkS3Bucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: watter-mark-ecv
+      AccessControl: Private
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
   MySESVerifiedEmail:
     Type: "AWS::SES::EmailIdentity"
     Properties:
@@ -277,11 +290,15 @@ Resources:
             QueueName: !GetAtt MetaDataOnSuccessQueue.QueueName
         - SQSSendMessagePolicy:
             QueueName: !GetAtt MetaDataOnFailQueue.QueueName
-      #   - S3ReadPolicy:
-      #       BucketName: !Ref AvatarS3Bucket
-      # Environment:
-      #   Variables:
-      #     BUCKET_NAME: !Ref AvatarS3Bucket
+        - S3WritePolicy:
+            BucketName: !Ref WaterMarkS3Bucket
+        # - S3ReadPolicy:
+        #     BucketName: !Ref WaterMarkS3Bucket
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref WaterMarkS3Bucket
+      EphemeralStorage:
+        Size: 10240
       Layers:
         - !Ref SharedLayerLambda # Reference to the Lambda Layer
       EventInvokeConfig:
