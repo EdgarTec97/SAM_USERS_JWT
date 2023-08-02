@@ -5,6 +5,7 @@ export {
   MinLength,
   IsBoolean
 } from 'class-validator';
+export { config } from '@/infrastructure/config';
 
 import HttpStatus from '@/domain/types/HttpStatus';
 import middify from '@/infrastructure/middlewares/middify';

@@ -37,6 +37,10 @@ Parameters:
     Type: String
   AdminEmail:
     Type: String
+  ffmpegLayerArn:
+    Type: String
+  WaterMarkImg:
+    Type: String
 
 Resources:
   # Define an SNS topic for User Service notifications
@@ -292,15 +296,19 @@ Resources:
             QueueName: !GetAtt MetaDataOnFailQueue.QueueName
         - S3WritePolicy:
             BucketName: !Ref WaterMarkS3Bucket
-        # - S3ReadPolicy:
-        #     BucketName: !Ref WaterMarkS3Bucket
+        - S3ReadPolicy:
+            BucketName: !Ref WaterMarkS3Bucket
+        - S3ReadPolicy:
+            BucketName: avatars-bucket-ecv
       Environment:
         Variables:
           BUCKET_NAME: !Ref WaterMarkS3Bucket
+          WATER_MARK_IMG: !Ref WaterMarkImg
       EphemeralStorage:
         Size: 10240
       Layers:
         - !Ref SharedLayerLambda # Reference to the Lambda Layer
+        - !Ref ffmpegLayerArn
       EventInvokeConfig:
         DestinationConfig:
           OnSuccess:
@@ -315,6 +323,11 @@ Resources:
           Properties:
             Bucket: !Ref AvatarS3Bucket
             Events: s3:ObjectCreated:*
+            # Filter:
+            #   S3Key:
+            #     Rules:
+            #       - Name: suffix
+            #         Value: .png
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:

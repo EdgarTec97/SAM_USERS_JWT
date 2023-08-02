@@ -3,7 +3,9 @@ import {
   S3Client,
   S3ClientConfig,
   PutObjectCommand,
-  PutObjectCommandInput
+  PutObjectCommandInput,
+  GetObjectCommand,
+  GetObjectCommandInput
 } from '@aws-sdk/client-s3';
 import { config } from '@/infrastructure/config';
 
@@ -31,10 +33,24 @@ export class S3BucketService implements IBucketService<Boolean> {
     return S3BucketService.instance;
   }
 
-  async send(data: BucketParams): Promise<Boolean> {
+  async get<S>(fileName: string, bucket?: string): Promise<S> {
+    try {
+      const params: GetObjectCommandInput = {
+        Bucket: bucket || config.aws.bucket,
+        Key: fileName
+      };
+      const data = await this.s3Client.send(new GetObjectCommand(params));
+      return data.Body as S;
+    } catch (err) {
+      console.error('Error fetching S3 object:', err);
+      throw err;
+    }
+  }
+
+  async send(data: BucketParams, bucket?: string): Promise<Boolean> {
     try {
       const params: PutObjectCommandInput = {
-        Bucket: config.aws.bucket,
+        Bucket: bucket || config.aws.bucket,
         Key: data.filePath,
         Body: data.file,
         ACL: 'public-read'

@@ -15,7 +15,8 @@ export const config = {
     region: process.env.AWS_REGION || 'us-east-1',
     userTopic: process.env.TOPIC_ARN,
     bucket: process.env.BUCKET_NAME,
-    adminEmail: process.env.ADMIN_EMAIL
+    adminEmail: process.env.ADMIN_EMAIL,
+    waterMarkImg: process.env.WATER_MARK_IMG
   },
   isOffline: process.env.IS_OFFLINE == 'true' // Variable IS_OFFLINE is always set true when the app runs locally by the serverless-offline plugin (sam local start-api).
 };

@@ -4,5 +4,6 @@ export type BucketParams = {
 };
 
 export interface IBucketService<T> {
-  send(params: BucketParams): Promise<T>;
+  send(params: BucketParams, bucket?: string): Promise<T>;
+  get<S>(fileName: string, bucket?: string): Promise<S>;
 }
