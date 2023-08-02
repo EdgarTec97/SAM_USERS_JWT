@@ -50,12 +50,12 @@ const watermarkVideo = async (bucket: string, key: string) => {
   // Save original to tmp directory
   const tempFile = `${ffTmp}/${Key}`;
   console.info('Saving downloaded file to ', tempFile);
-  fs.writeFileSync(tempFile, data.Body);
+  fs.writeFileSync(tempFile, data);
 
   // Save watermark file to tmp directory
   const tempWatermark = `${ffTmp}/${config.aws.waterMarkImg}`;
   console.info('Saving downloaded file to ', tempWatermark);
-  fs.writeFileSync(tempWatermark, watermarkData.Body);
+  fs.writeFileSync(tempWatermark, watermarkData);
 
   // Add watermark and save to /tmp
   const outputFilename = `watermark-${Key}`;
