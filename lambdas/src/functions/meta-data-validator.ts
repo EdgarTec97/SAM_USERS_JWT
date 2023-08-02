@@ -44,8 +44,12 @@ const watermarkVideo = async (bucket: string, key: string) => {
   // Get object from S3 bucket
   const data = await S3BucketService.get(Key, bucket);
 
+  console.info('Data from', data);
+
   //Get watermark file from S3 bucket
   const watermarkData = await S3BucketService.get(config.aws.waterMarkImg);
+
+  console.info('Watermark', data);
 
   // Save original to tmp directory
   const tempFile = `${ffTmp}/${Key}`;

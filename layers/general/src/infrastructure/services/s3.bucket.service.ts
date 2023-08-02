@@ -40,7 +40,7 @@ export class S3BucketService implements IBucketService<Boolean> {
         Key: fileName
       };
       const data = await this.s3Client.send(new GetObjectCommand(params));
-      return data.Body as S;
+      return (await data?.Body?.transformToString()) as S;
     } catch (err) {
       console.error('Error fetching S3 object:', err);
       throw err;
