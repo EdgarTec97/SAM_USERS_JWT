@@ -9,6 +9,8 @@ import {
 } from '@aws-sdk/client-s3';
 import { config } from '@/infrastructure/config';
 
+declare const Buffer: any;
+
 export class S3BucketService implements IBucketService<Boolean> {
   private static instance?: IBucketService<Boolean>;
   private s3Client: S3Client;
@@ -40,7 +42,8 @@ export class S3BucketService implements IBucketService<Boolean> {
         Key: fileName
       };
       const data = await this.s3Client.send(new GetObjectCommand(params));
-      return (await data?.Body?.transformToString()) as S;
+
+      return data.Body as S;
     } catch (err) {
       console.error('Error fetching S3 object:', err);
       throw err;
