@@ -1,7 +1,5 @@
 import { Handler, S3Event, Callback, Context } from 'aws-lambda';
-import { S3BucketService, config } from '@general';
-//@ts-ignore  FROM @general LAYER
-import Jimp from 'jimp';
+import { S3BucketService, config, Jimp } from '@general';
 
 const metaDataValidator = async (
   event: S3Event,
@@ -51,7 +49,14 @@ const metaDataValidator = async (
     ]);
 
     const uploadKey = `watermarked-${key}`;
-    await S3BucketService.send({ filePath: uploadKey, file: data.bitmap.data });
+
+    data.write(`/tmp/${uploadKey}`);
+
+    const fs = require('fs');
+
+    const tmpData = fs.readFileSync(`/tmp/${uploadKey}`);
+
+    await S3BucketService.send({ filePath: uploadKey, file: tmpData });
 
     callback(null, {
       success: true,
@@ -62,7 +67,5 @@ const metaDataValidator = async (
     callback(error);
   }
 };
-
-declare const Buffer: any;
 
 export const handler: Handler = metaDataValidator;

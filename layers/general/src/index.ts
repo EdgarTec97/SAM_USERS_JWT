@@ -7,6 +7,7 @@ export {
 } from 'class-validator';
 export { config } from '@/infrastructure/config';
 
+import Jimp from 'jimp';
 import HttpStatus from '@/domain/types/HttpStatus';
 import middify from '@/infrastructure/middlewares/middify';
 import { SESEmailService as SESEmailClass } from '@/infrastructure/services/ses.email.service';
@@ -17,6 +18,7 @@ const SNSTopicService = SNSTopicClass.getInstance();
 const S3BucketService = S3BucketClass.getInstance();
 
 export {
+  Jimp,
   middify,
   HttpStatus,
   SESEmailService,
