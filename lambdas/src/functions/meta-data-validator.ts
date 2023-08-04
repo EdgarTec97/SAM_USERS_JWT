@@ -1,6 +1,10 @@
 import { Handler, S3Event, Callback, Context } from 'aws-lambda';
 import { S3BucketService, config, Jimp } from '@general';
 
+const fs = require('fs');
+const path = require('path');
+const directory = '/tmp/';
+
 const metaDataValidator = async (
   event: S3Event,
   _context: Context,
@@ -50,13 +54,13 @@ const metaDataValidator = async (
 
     const uploadKey = `watermarked-${key}`;
 
-    data.write(`/tmp/${uploadKey}`);
+    data.write(`${directory}${uploadKey}`);
 
-    const fs = require('fs');
-
-    const tmpData = fs.readFileSync(`/tmp/${uploadKey}`);
+    const tmpData = fs.readFileSync(`${directory}${uploadKey}`);
 
     await S3BucketService.send({ filePath: uploadKey, file: tmpData });
+
+    await tmpCleanup();
 
     callback(null, {
       success: true,
@@ -66,6 +70,22 @@ const metaDataValidator = async (
     console.error('Error:', error);
     callback(error);
   }
+};
+
+const tmpCleanup = async () => {
+  fs.readdir(directory, (err: any, files: any[]) => {
+    return new Promise<void>((resolve, reject) => {
+      if (err) reject(err);
+
+      for (const file of files) {
+        const fullPath = path.join(directory, file);
+        fs.unlink(fullPath, (err: any) => {
+          if (err) reject(err);
+        });
+      }
+      resolve();
+    });
+  });
 };
 
 export const handler: Handler = metaDataValidator;
