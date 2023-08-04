@@ -31,4 +31,8 @@ export class CreateUserDTO {
 
   @IsNumber()
   age!: number;
+
+  @IsString()
+  @IsOptional()
+  avatar?: string;
 }

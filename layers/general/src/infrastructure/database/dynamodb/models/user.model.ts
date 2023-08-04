@@ -14,6 +14,8 @@ export class UserDocument extends Item {
   phone!: string;
   age!: number;
   role!: UserRole;
+  verified!: boolean;
+  avatar!: string;
   active!: boolean;
   createdAt!: number;
   updatedAt!: number;

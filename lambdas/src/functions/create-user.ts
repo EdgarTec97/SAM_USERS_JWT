@@ -9,7 +9,8 @@ import {
   UserRepository,
   User,
   HttpStatus,
-  UserPrimitives
+  UserPrimitives,
+  SNSTopicService
 } from '@general';
 import { CreateUserDTO } from '@/functions/dtos/create-user.dto';
 
@@ -30,16 +31,23 @@ const createUser = async (
       phone: body.phone,
       password: body.password,
       age: body.age,
-      role: body.role
+      role: body.role,
+      avatar: body.avatar || '',
+      verified: false
     });
 
     await UserRepository.createOrUpdate(user, true);
 
+    const data = GlobalFunctions.getNewParams<UserPrimitives>(
+      user.toPrimitives(),
+      ['password']
+    );
+
+    await SNSTopicService.send(JSON.stringify(data));
+
     return formatJSONResponse(HttpStatus.CREATED, {
       success: true,
-      user: GlobalFunctions.getNewParams<UserPrimitives>(user.toPrimitives(), [
-        'password'
-      ])
+      user: data
     });
   } catch (error: DomainError | any) {
     console.error(error);

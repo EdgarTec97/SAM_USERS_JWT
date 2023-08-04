@@ -1,8 +1,30 @@
-export { IsOptional, IsString, IsNumber, MinLength } from 'class-validator';
+export {
+  IsOptional,
+  IsString,
+  IsNumber,
+  MinLength,
+  IsBoolean
+} from 'class-validator';
+export { config } from '@/infrastructure/config';
 
+import Jimp from 'jimp';
 import HttpStatus from '@/domain/types/HttpStatus';
 import middify from '@/infrastructure/middlewares/middify';
-export { middify, HttpStatus };
+import { SESEmailService as SESEmailClass } from '@/infrastructure/services/ses.email.service';
+import { SNSTopicService as SNSTopicClass } from '@/infrastructure/services/sns.topic.service';
+import { S3BucketService as S3BucketClass } from '@/infrastructure/services/s3.bucket.service';
+const SESEmailService = SESEmailClass.getInstance();
+const SNSTopicService = SNSTopicClass.getInstance();
+const S3BucketService = S3BucketClass.getInstance();
+
+export {
+  Jimp,
+  middify,
+  HttpStatus,
+  SESEmailService,
+  SNSTopicService,
+  S3BucketService
+};
 
 export { UserRole } from '@/domain/types/user.role';
 export { User, UserPrimitives } from '@/domain/entities/User';

@@ -20,6 +20,7 @@ Globals:
         DYNAMO_PORT: 4566
         SECRET_KEY: !Ref SecretKey
         EXPIRATION: !Ref Expiration
+        ADMIN_EMAIL: !Ref AdminEmail
 
 Parameters:
   TableName:
@@ -33,6 +34,12 @@ Parameters:
   SecretKey:
     Type: String
   Expiration:
+    Type: String
+  AdminEmail:
+    Type: String
+  ffmpegLayerArn:
+    Type: String
+  WaterMarkImg:
     Type: String
 
 Resources:
@@ -50,6 +57,9 @@ Resources:
       Tags:
         - Key: Environment
           Value: Production
+      # Subscription:
+      #   - Protocol: email
+      #     Endpoint: !Ref emailValidator
   # Define an SQS queue for User Service messages
   UserQueue:
     Type: "AWS::SQS::Queue"
@@ -67,7 +77,7 @@ Resources:
         # Set the Amazon Resource Name (ARN) of the dead-letter queue
         deadLetterTargetArn: !GetAtt UserDeadLetterQueue.Arn
         # Set the maximum number of receives before moving messages to the dead-letter queue
-        maxReceiveCount: 5
+        maxReceiveCount: 1
       # Add tags to the SQS queue (e.g., for identifying the environment)
       Tags:
         - Key: Environment
@@ -78,6 +88,22 @@ Resources:
     Properties:
       # Set the name of the dead-letter queue
       QueueName: UserDeadLetterQueue
+      # Set the message retention period (in seconds) for the dead-letter queue
+      MessageRetentionPeriod: 1209600
+  # Define an SQS [Success] queue for Meta data lambda destination
+  MetaDataOnSuccessQueue:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      # Set the name of the queue
+      QueueName: MetaDataOnSuccessQueue
+      # Set the message retention period (in seconds) for the dead-letter queue
+      MessageRetentionPeriod: 1209600
+  # Define an SQS [Fail] queue for Meta data lambda destination
+  MetaDataOnFailQueue:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      # Set the name of the queue
+      QueueName: MetaDataOnFailQueue
       # Set the message retention period (in seconds) for the dead-letter queue
       MessageRetentionPeriod: 1209600
   # Define an SQS Access Policy
@@ -147,6 +173,36 @@ Resources:
           Projection:
             # Specifies which attributes should be projected to the index
             ProjectionType: ALL
+  AvatarS3Bucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: avatars-bucket-ecv
+      AccessControl: Private
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+  WaterMarkS3Bucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: watter-mark-ecv
+      AccessControl: Private
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+  MySESVerifiedEmail:
+    Type: "AWS::SES::EmailIdentity"
+    Properties:
+      EmailIdentity: !Ref AdminEmail
 
   SharedLayerLambda:
     Type: AWS::Serverless::LayerVersion
@@ -168,10 +224,15 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref TableName
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt TopicUserService.TopicName
       Architectures:
         - x86_64
       Layers:
         - !Ref SharedLayerLambda # Reference to the Lambda Layer
+      Environment:
+        Variables:
+          TOPIC_ARN: !Ref TopicUserService
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -188,6 +249,95 @@ Resources:
         Sourcemap: false
         EntryPoints:
           - create-user.ts
+
+  NotificationUser:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: lambdas/src/functions/
+      Handler: user-message.handler
+      Runtime: nodejs18.x
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt UserQueue.QueueName
+        - AmazonSESFullAccess
+      Architectures:
+        - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
+      Events:
+        UserQueue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt UserQueue.Arn
+            BatchSize: 10
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        External:
+          - "@general"
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - user-message.ts
+
+  MetaDataValidator:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: lambdas/src/functions/
+      Handler: meta-data-validator.handler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt MetaDataOnSuccessQueue.QueueName
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt MetaDataOnFailQueue.QueueName
+        - S3WritePolicy:
+            BucketName: !Ref WaterMarkS3Bucket
+        - S3ReadPolicy:
+            BucketName: !Ref WaterMarkS3Bucket
+        - S3ReadPolicy:
+            BucketName: avatars-bucket-ecv
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref WaterMarkS3Bucket
+          WATER_MARK_IMG: !Ref WaterMarkImg
+      EphemeralStorage:
+        Size: 10240
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
+        - !Ref ffmpegLayerArn
+      EventInvokeConfig:
+        DestinationConfig:
+          OnSuccess:
+            Type: SQS
+            Destination: !GetAtt MetaDataOnSuccessQueue.Arn
+          OnFailure:
+            Type: SQS
+            Destination: !GetAtt MetaDataOnFailQueue.Arn
+      Events:
+        MyS3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref AvatarS3Bucket
+            Events: s3:ObjectCreated:*
+            # Filter:
+            #   S3Key:
+            #     Rules:
+            #       - Name: suffix
+            #         Value: .png
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        External:
+          - "@general"
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - meta-data-validator.ts
 
   GetUserById:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -318,15 +468,10 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref TableName
-        - SNSPublishMessagePolicy:
-            TopicName: !GetAtt TopicUserService.TopicName
       Architectures:
         - x86_64
       Layers:
         - !Ref SharedLayerLambda # Reference to the Lambda Layer
-      Environment:
-        Variables:
-          TOPIC_ARN: !Ref TopicUserService
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -343,35 +488,6 @@ Resources:
         Sourcemap: false
         EntryPoints:
           - login.ts
-
-  NotificationUser:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: lambdas/src/functions/
-      Handler: user-message.handler
-      Runtime: nodejs18.x
-      Policies:
-        - SQSPollerPolicy:
-            QueueName: !GetAtt UserQueue.QueueName
-      Architectures:
-        - x86_64
-      Layers:
-        - !Ref SharedLayerLambda # Reference to the Lambda Layer
-      Events:
-        UserQueue:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt UserQueue.Arn
-    Metadata: # Manage esbuild properties
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        External:
-          - "@general"
-        Target: es2020
-        Sourcemap: false
-        EntryPoints:
-          - user-message.ts
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group

@@ -1,4 +1,11 @@
-import { IsString, IsNumber, IsOptional, MinLength, UserRole } from '@general';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  MinLength,
+  UserRole,
+  IsBoolean
+} from '@general';
 
 export class UpdateUserDTO {
   @IsString()
@@ -37,4 +44,12 @@ export class UpdateUserDTO {
   @IsNumber()
   @IsOptional()
   age!: number;
+
+  @IsBoolean()
+  @IsOptional()
+  verified!: number;
+
+  @IsString()
+  @IsOptional()
+  avatar?: string;
 }
