@@ -30,6 +30,7 @@
     "dayjs": "^1.11.8",
     "dynamoose": "3.2.0",
     "esbuild": "0.14.14",
+    "jimp": "^0.22.10",
     "jsonwebtoken": "^9.0.0",
     "reflect-metadata": "0.1.13",
     "uuid": "8.3.2"

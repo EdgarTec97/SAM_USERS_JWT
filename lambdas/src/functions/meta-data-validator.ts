@@ -1,5 +1,7 @@
 import { Handler, S3Event, Callback, Context } from 'aws-lambda';
 import { S3BucketService, config } from '@general';
+//@ts-ignore  FROM @general LAYER
+import Jimp from 'jimp';
 
 const metaDataValidator = async (
   event: S3Event,
@@ -10,23 +12,46 @@ const metaDataValidator = async (
     const originalBucket = event.Records[0].s3.bucket.name;
     const key = event.Records[0].s3.object.key;
 
-    let getObjectResponse = await S3BucketService.get(key, originalBucket);
+    // let getObjectResponse = await S3BucketService.get(key, originalBucket);
 
-    //getObjectResponse = await getObjectResponse.transformToString();
+    // getObjectResponse = await getObjectResponse.transformToString(); // transformToString('base64')
 
-    let getWatermarkResponse = await S3BucketService.get(
-      config.aws.waterMarkImg
-    );
+    // let getWatermarkResponse = await S3BucketService.get(
+    //   config.aws.waterMarkImg
+    // );
 
-    //getWatermarkResponse = await getWatermarkResponse.transformToString();
+    // getWatermarkResponse = await getWatermarkResponse.transformToString();
 
-    const watermarkedImage = applyWatermark(
-      getObjectResponse,
-      getWatermarkResponse
-    );
+    // const watermarkedImage = applyWatermark(
+    //   getObjectResponse,
+    //   getWatermarkResponse
+    // );
 
-    const uploadKey = `watermarked_${key}`;
-    await S3BucketService.send({ filePath: uploadKey, file: watermarkedImage });
+    const [image, logo] = await Promise.all([
+      Jimp.read(`https://${originalBucket}.s3.amazonaws.com/${key}`),
+      Jimp.read(
+        `https://${config.aws.bucket}.s3.amazonaws.com/${config.aws.waterMarkImg}`
+      )
+    ]);
+
+    logo.resize(image.bitmap.width / 10, Jimp.AUTO);
+
+    const xMargin = (image.bitmap.width * 1) / 100;
+    const yMargin = (image.bitmap.width * 1) / 100;
+
+    const X = image.bitmap.width - logo.bitmap.width - xMargin;
+    const Y = image.bitmap.height - logo.bitmap.height - yMargin;
+
+    const data = image.composite(logo, X, Y, [
+      {
+        mode: Jimp.BLEND_SCREEN,
+        opacitySource: 0.1,
+        opacityDest: 1
+      }
+    ]);
+
+    const uploadKey = `watermarked-${key}`;
+    await S3BucketService.send({ filePath: uploadKey, file: data.bitmap.data });
 
     callback(null, {
       success: true,
@@ -39,11 +64,5 @@ const metaDataValidator = async (
 };
 
 declare const Buffer: any;
-
-function applyWatermark<T>(imageData: T, watermarkData: T): T {
-  const combinedImage = Buffer.concat([imageData, watermarkData]);
-
-  return combinedImage;
-}
 
 export const handler: Handler = metaDataValidator;
