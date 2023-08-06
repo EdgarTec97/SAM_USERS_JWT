@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const fs = require('fs');
 const path = require('path');
 
@@ -69,4 +70,4 @@ const distPath = path.join(__dirname, 'build');
 createDirRecursive(distPath);
 copyFilesRecursively(srcPath, distPath, aliasMap);
 
-console.log('All imports modified and files copied successfully!');
+console.info('All imports modified and files copied successfully!');
