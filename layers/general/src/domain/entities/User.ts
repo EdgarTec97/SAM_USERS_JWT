@@ -68,7 +68,7 @@ export class User {
     if (this.isValidHttpUrl(this.avatar))
       throw new InvalidPropertyError(
         this.avatar,
-        'The avatar should have correct url format (location)'
+        `The avatar should have correct url format (location): ${this.avatar}`
       );
 
     if (this.age < 18)
