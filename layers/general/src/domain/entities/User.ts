@@ -65,7 +65,7 @@ export class User {
         "The email isn't in the correct format."
       );
 
-    if (this.isValidHttpUrl(this.avatar))
+    if (this.avatar && !this.isValidHttpUrl(this.avatar))
       throw new InvalidPropertyError(
         this.avatar,
         `The avatar should have correct url format (location): ${this.avatar}`

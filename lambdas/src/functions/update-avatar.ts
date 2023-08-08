@@ -36,11 +36,6 @@ const updateAvatar = async (
       file.filename.split('.')[1]
     }`;
 
-    await S3BucketService.send({
-      filePath: fileName,
-      file: file.content.toString()
-    });
-
     const user = User.fromPrimitives({
       id: userId,
       firstName: userExists.getFirstName(),
@@ -54,6 +49,11 @@ const updateAvatar = async (
       verified: userExists.getVerified(),
       avatar: `https://${config.aws.bucket}.s3.amazonaws.com/${fileName}`,
       createdAt: <string>(<unknown>Date.parse(userExists.getCreatedAt()))
+    });
+
+    await S3BucketService.send({
+      filePath: fileName,
+      file: file.content.toString()
     });
 
     await UserRepository.createOrUpdate(user, false, userExists.getPassword());
