@@ -13,7 +13,8 @@ import {
   HttpStatus,
   UserId,
   BASIC,
-  GlobalFunctions
+  GlobalFunctions,
+  config
 } from '@general';
 
 declare const Buffer: any;
@@ -33,29 +34,31 @@ const updateAvatar = async (
 
     if (!file) throw new DTOPropertiesError('file');
 
+    const fileName = `${GlobalFunctions.randomUUID()}-${new Date().toISOString()}.${
+      file.filename.split('.')[1]
+    }`;
+
     await S3BucketService.send({
-      filePath: `${GlobalFunctions.randomUUID()}-${new Date().toISOString()}.${
-        file.filename.split('.')[1]
-      }`,
+      filePath: fileName,
       file: file.content.toString()
     });
 
-    // const user = User.fromPrimitives({
-    //   id: userId,
-    //   firstName: body?.firstName || userExists.getFirstName(),
-    //   lastName: body?.lastName || userExists.getLastName(),
-    //   username: body?.username || userExists.getUsername(),
-    //   email: body?.email || userExists.getEmail(),
-    //   phone: body?.phone || userExists.getPhone(),
-    //   password: body?.password,
-    //   age: body?.age || userExists.getAge(),
-    //   role: body?.role || userExists.getRole(),
-    //   verified: userExists.getVerified(),
-    //   avatar: body?.avatar || userExists.getAvatar(),
-    //   createdAt: <string>(<unknown>Date.parse(userExists.getCreatedAt()))
-    // });
+    const user = User.fromPrimitives({
+      id: userId,
+      firstName: userExists.getFirstName(),
+      lastName: userExists.getLastName(),
+      username: userExists.getUsername(),
+      email: userExists.getEmail(),
+      phone: userExists.getPhone(),
+      password: undefined,
+      age: userExists.getAge(),
+      role: userExists.getRole(),
+      verified: userExists.getVerified(),
+      avatar: `https://${config.aws.bucket}.s3.amazonaws.com/${fileName}`,
+      createdAt: <string>(<unknown>Date.parse(userExists.getCreatedAt()))
+    });
 
-    // await UserRepository.createOrUpdate(user, false, userExists.getPassword());
+    await UserRepository.createOrUpdate(user, false, userExists.getPassword());
 
     return formatJSONResponse(HttpStatus.CREATED, {
       success: true,

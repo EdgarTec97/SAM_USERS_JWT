@@ -56,6 +56,7 @@ export class S3BucketService implements IBucketService<Boolean> {
         Bucket: bucket || config.aws.bucket,
         Key: data.filePath,
         Body: data.file,
+        ContentType: data.ContentType,
         ACL: 'public-read'
       };
 
