@@ -32,7 +32,7 @@ const updateAvatar = async (
 
     if (!file) throw new DTOPropertiesError('file');
 
-    const fileName = `${GlobalFunctions.randomUUID()}-${new Date().toISOString()}.${
+    const fileName = `${GlobalFunctions.randomUUID()}.${
       file.filename.split('.')[1]
     }`;
 
