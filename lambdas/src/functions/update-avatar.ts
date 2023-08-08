@@ -17,8 +17,6 @@ import {
   config
 } from '@general';
 
-declare const Buffer: any;
-
 const updateAvatar = async (
   event: RequestDTO<any>
 ): Promise<APIGatewayProxyResult> => {
