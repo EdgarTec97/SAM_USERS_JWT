@@ -7,13 +7,14 @@ import {
   middify,
   DomainError,
   IDPathParameterMissing,
+  DTOPropertiesError,
   UserRepository,
   User,
   HttpStatus,
   UserId,
-  BASIC
+  BASIC,
+  GlobalFunctions
 } from '@general';
-import { UpdateUserDTO } from '@/functions/dtos/update-user.dto';
 
 declare const Buffer: any;
 
@@ -28,9 +29,16 @@ const updateAvatar = async (
 
     const userExists = await UserRepository.getUserById(new UserId(userId));
 
-    const fileContent = Buffer.from(event.body, 'base64');
+    const file = event.body.file;
 
-    await S3BucketService.send({ filePath: 'tes', file: fileContent });
+    if (!file) throw new DTOPropertiesError('file');
+
+    await S3BucketService.send({
+      filePath: `${GlobalFunctions.randomUUID()}-${new Date().toISOString()}.${
+        file.filename.split('.')[1]
+      }`,
+      file: file.content.toString()
+    });
 
     // const user = User.fromPrimitives({
     //   id: userId,
@@ -55,6 +63,7 @@ const updateAvatar = async (
     });
   } catch (error: DomainError | any) {
     console.error(error);
+    console.error(event.body);
 
     if (error instanceof DomainError) return formatErrorResponse(error);
 
@@ -65,4 +74,4 @@ const updateAvatar = async (
   }
 };
 
-export const handler: Handler = updateAvatar;
+export const handler: Handler = middify(updateAvatar, null, BASIC, true);

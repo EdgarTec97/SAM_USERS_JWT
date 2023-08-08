@@ -378,10 +378,15 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref TableName
+        - S3WritePolicy:
+            BucketName: !Ref AvatarS3Bucket
       Architectures:
         - x86_64
       Layers:
         - !Ref SharedLayerLambda # Reference to the Lambda Layer
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref AvatarS3Bucket
       Events:
         UserAPI:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
