@@ -369,6 +369,41 @@ Resources:
         EntryPoints:
           - get-user-by-id.ts
 
+  UpdateAvatarUser:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: lambdas/src/functions/
+      Handler: update-avatar.handler
+      Runtime: nodejs18.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableName
+        - S3WritePolicy:
+            BucketName: !Ref AvatarS3Bucket
+      Architectures:
+        - x86_64
+      Layers:
+        - !Ref SharedLayerLambda # Reference to the Lambda Layer
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref AvatarS3Bucket
+      Events:
+        UserAPI:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /avatar/{userId}
+            Method: patch
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        External:
+          - "@general"
+        Target: es2020
+        Sourcemap: false
+        EntryPoints:
+          - update-avatar.ts
+
   GetUsers:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:

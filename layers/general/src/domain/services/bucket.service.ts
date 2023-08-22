@@ -1,6 +1,7 @@
 export type BucketParams = {
   file: any;
   filePath: string;
+  ContentType?: string;
 };
 
 export interface IBucketService<T> {
